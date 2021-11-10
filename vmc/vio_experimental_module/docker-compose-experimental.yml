@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+
+  vio-expiremental:
+    image: getting-started:latest
+    privileged: true
+    restart: on-failure
+
+  # sandbox:
+  #   depends_on:
+  #     - mqtt
+  #   build: vrc_sandbox
+  #   restart: on-failure
