@@ -31,8 +31,8 @@ WORKDIR /
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
-RUN python3.8 -m pip install pip wheel --upgrade && \
-    python3.8 -m pip install -r requirements.txt
+RUN python3 -m pip install pip wheel --upgrade && \
+    python3 -m pip install -r requirements.txt
 RUN ls -l /usr/local/
 RUN ls -l /usr/local/zed #redo3
 RUN ls -l /usr/local/zed/include
@@ -41,4 +41,4 @@ RUN ls -l /etc/
 
 COPY . .
 
-CMD ["python3.8", "vio-experimental.py"]
+CMD ["python3", "vio-experimental.py"]
