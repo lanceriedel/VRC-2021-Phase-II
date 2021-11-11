@@ -252,8 +252,10 @@ class Sandbox():
             tag = data[0]
             tagid = tag["id"]
 
-            heading = tag["heading"] 
-            which_pixel = (int)(((float)(heading/360.0))*32.0)
+            heading = tag["heading"]
+            angletotag = tag["angle_to_tag"] 
+ 
+            which_pixel = (int)(((float)(angletotag/360.0))*32.0)
                 #{"target_pixel":16,"delay_ms":250}
                 #vrc/pcc/set_pixel_cycle
             datamsgpixl = {"target_pixel": which_pixel, "delay_ms": 25}
