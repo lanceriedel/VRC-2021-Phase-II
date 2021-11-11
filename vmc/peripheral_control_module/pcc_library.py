@@ -195,7 +195,7 @@ class VRC_Peripheral(object):
         length = 3  # command + pixel + waittime_ms
         data = []
 
-        data = [pixel, waittime_ms]
+        data = [waittime_ms, pixel]
         valid_command = True
 
         if valid_command:
