@@ -36,6 +36,7 @@ class PCCModule(object):
             f"{self.topic_prefix}/set_servo_min": self.set_servo_min,
             f"{self.topic_prefix}/set_servo_max": self.set_servo_max,
             f"{self.topic_prefix}/set_servo_pct": self.set_servo_pct,
+            f"{self.topic_prefix}/set_pixel_cycle": self.set_pixel_cycle,
             f"{self.topic_prefix}/reset": self.reset,
         }
 
@@ -89,6 +90,11 @@ class PCCModule(object):
         servo: int = payload["servo"]
         pulse: int = payload["max_pulse"]
         self.pcc.set_servo_max(servo, pulse)
+
+    def set_pixel_cycle(self, payload: dict) -> None:
+        target_pixel: int = payload["target_pixel"]
+        delay_ms: int = payload["delay_ms"]
+        self.pcc.set_pixel_cycle( target_pixel,delay_ms)
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]

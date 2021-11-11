@@ -24,8 +24,9 @@ class VRC_Peripheral(object):
             "SET_SERVO_PCT": 3,
             "SET_BASE_COLOR": 4,
             "SET_TEMP_COLOR": 5,
-            "RESET_VRC_PERIPH": 6,
-            "CHECK_SERVO_CONTROLLER": 7,
+            "SET_PIXEL_CYCLE" : 6,
+            "RESET_VRC_PERIPH": 7,
+            "CHECK_SERVO_CONTROLLER": 8,
         }
 
         self.use_serial = use_serial
@@ -187,6 +188,23 @@ class VRC_Peripheral(object):
             command = self.commands["CHECK_SERVO_CONTROLLER"]
             length = 1
             self.ser.write(self._construct_payload(command, length))
+
+    def set_pixel_cycle(self,pixel: int,waittime_ms: int) -> None:
+        
+        command = self.commands["SET_PIXEL_CYCLE"]
+        length = 3  # command + pixel + waittime_ms
+        data = []
+
+        data = [pixel, waittime_ms]
+        valid_command = True
+
+        if valid_command:
+            if self.use_serial is True:
+                self.ser.write(self._construct_payload(command, length, data))
+            else:
+                logger.debug("VRC_Peripheral serial data: ")
+                logger.debug(data)
+
 
     def _construct_payload(self, code: int, size: int = 0, data: list = []):
         # [$][P][>][LENGTH-HI][LENGTH-LOW][DATA][CRC]
