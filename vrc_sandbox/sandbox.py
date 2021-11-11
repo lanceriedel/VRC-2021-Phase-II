@@ -253,18 +253,7 @@ class Sandbox():
             tagid = tag["id"]
 
             heading = tag["heading"]
-            angletotag = tag["angle_to_tag"] 
-            anglefromtag = angletotag+180.0
-            if angletotag>360:
-                anglefromtag = anglefromtag - 360.0
- 
-            which_pixel = (int)(((float)(anglefromtag/360.0))*32.0)
-                #{"target_pixel":16,"delay_ms":250}
-                #vrc/pcc/set_pixel_cycle
-            datamsgpixl = {"target_pixel": which_pixel, "delay_ms": 25}
-            payloadpixl = json.dumps(datamsgpixl)
-            self.mqtt_client.publish(topic=f"{self.topic_prefix}/pcc/set_pixel_cycle", payload=payloadpixl)
-
+            
             #Change colors for pathways
             if (tagid==5):
                 self.send_color_mesg("red") 
@@ -277,7 +266,25 @@ class Sandbox():
             else:
                 horizontal_dist = tag["horizontal_dist"] 
                 vertical_dist = tag["vertical_dist"] 
-               
+                angletotag = tag["angle_to_tag"] 
+
+                anglefromtag = angletotag+180.0
+                if angletotag>360:
+                  anglefromtag = anglefromtag - 360.0
+
+                pixl_speed =  int(horizontal_dist)
+                if pixl_speed > 250: 
+                    pixl_speed = 250
+
+            
+            
+                which_pixel = (int)(((float)(anglefromtag/360.0))*32.0)
+                    #{"target_pixel":16,"delay_ms":250}
+                    #vrc/pcc/set_pixel_cycle
+                datamsgpixl = {"target_pixel": which_pixel, "delay_ms": pixl_speed}
+                payloadpixl = json.dumps(datamsgpixl)
+                self.mqtt_client.publish(topic=f"{self.topic_prefix}/pcc/set_pixel_cycle", payload=payloadpixl)
+
 
                 print(f"heading: {heading} ")
                 print(f"vertical_dist: {vertical_dist} ")
