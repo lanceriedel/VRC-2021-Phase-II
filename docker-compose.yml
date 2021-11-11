@@ -28,7 +28,7 @@ services:
   pcc:
     depends_on:
       - mqtt
-    image: ghcr.io/bellflight/vrc_peripheral_control_module:latest
+    image: lance/vrc_peripheral_control_module:latest
     restart: on-failure
     devices:
       - "/dev/ttyACM0:/dev/ttyACM0"
