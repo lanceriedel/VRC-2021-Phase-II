@@ -276,7 +276,7 @@ class Sandbox():
                 if pixl_speed > 30: 
                     pixl_speed = 30
 
-                pixl_speed = ((((float)(pixl_speed-10))/20.0)) *  250
+                pixl_speed = (int)(((((float)(pixl_speed-10))/20.0)) *  250)
                 if pixl_speed > 250: 
                     pixl_speed = 250
                 if (pixl_speed<25):
