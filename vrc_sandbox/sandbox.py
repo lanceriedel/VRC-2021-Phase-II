@@ -252,6 +252,14 @@ class Sandbox():
             tag = data[0]
             tagid = tag["id"]
 
+            heading = tag["heading"] 
+            which_pixel = (int)(heading/360)*32
+                #{"target_pixel":16,"delay_ms":250}
+                #vrc/pcc/set_pixel_cycle
+            datamsgpixl = {"target_pixel": which_pixel, "delay_ms": 25}
+            payloadpixl = json.dumps(datamsgpixl)
+            self.mqtt_client.publish(topic=f"{self.topic_prefix}/pcc/set_pixel_cycle", payload=payloadpixl)
+
             #Change colors for pathways
             if (tagid==5):
                 self.send_color_mesg("red") 
@@ -264,7 +272,8 @@ class Sandbox():
             else:
                 horizontal_dist = tag["horizontal_dist"] 
                 vertical_dist = tag["vertical_dist"] 
-                heading = tag["heading"] 
+               
+
                 print(f"heading: {heading} ")
                 print(f"vertical_dist: {vertical_dist} ")
                 print(f"****** XXhorizontal_dist: {horizontal_dist} ")
