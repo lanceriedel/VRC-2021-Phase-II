@@ -276,7 +276,7 @@ class Sandbox():
                 if pixl_speed > 30: 
                     pixl_speed = 30
 
-                pixl_speed = (int)(((((float)(pixl_speed-10))/20.0)) *  250)
+                pixl_speed = (int)(((((float)(pixl_speed-10))/20.0)) *  100)
                 if pixl_speed > 250: 
                     pixl_speed = 250
                 if (pixl_speed<25):
@@ -297,7 +297,7 @@ class Sandbox():
                 print(f"****** XXhorizontal_dist: {horizontal_dist} ")
                 
                 
-                if (horizontal_dist<10):
+                if (horizontal_dist<5):
 
                     print(f"******------------- ABOUT TO DROP, TURNING GREEN!!!!!!!!!!!!!!****************")
                     self.send_color_mesg("green") 
@@ -310,7 +310,7 @@ class Sandbox():
                     
 
 
-                elif (horizontal_dist>10):
+                elif (horizontal_dist>5):
                     print(f"******------COLOR GRADIENT!!!!!!!!!!!!!****************")
                     self.send_color_by_distance_mesg(horizontal_dist)  
                 
