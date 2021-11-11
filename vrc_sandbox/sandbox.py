@@ -272,15 +272,16 @@ class Sandbox():
                 if angletotag>360:
                   anglefromtag = anglefromtag - 360.0
 
-                pixl_speed =  int(horizontal_dist)
-                if pixl_speed > 30: 
-                    pixl_speed = 30
+                pixl_speed = 20
+                #pixl_speed =  int(horizontal_dist)
+                #if pixl_speed > 30: 
+                #    pixl_speed = 30
 
-                pixl_speed = (int)(((((float)(pixl_speed-10))/20.0)) *  100)
-                if pixl_speed > 250: 
-                    pixl_speed = 250
-                if (pixl_speed<25):
-                    pixl_speed = 25
+                #pixl_speed = (int)(((((float)(pixl_speed-10))/20.0)) *  100)
+                #if pixl_speed > 250: 
+                #    pixl_speed = 250
+               # if (pixl_speed<25):
+                #    pixl_speed = 25
 
             
             
