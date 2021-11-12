@@ -19,11 +19,17 @@
 ########################################################################
 
 import pyzed.sl as sl
+from loguru import logger
+import re
+import subprocess
+
 
 def main():
     # Create a Camera object
+    logger.debug("Starting Camera initialization -- pyzed.sl loaded")
     zed = sl.Camera()
-
+    logger.debug("Loaded Camera obj")
+    
     # Create a InitParameters object and set configuration parameters
     init_params = sl.InitParameters()
     init_params.camera_resolution = sl.RESOLUTION.HD720  # Use HD720 video mode (default fps: 60)
@@ -31,10 +37,25 @@ def main():
     init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
     init_params.coordinate_units = sl.UNIT.METER  # Set units in meters
 
+    logger.debug("About to open Camera --")
+    device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$",re.I)
+    df = subprocess.check_output("lsusb")
+    devices=[]
+    for i in df.split(b'\n'):
+            if i:
+                info = device_re.match(i.decode('utf-8'))
+                if info:
+                    dinfo = info.groupdict()
+                    dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
+                    devices.append(dinfo)
+    print (devices)
+
     # Open the camera
     err = zed.open(init_params)
     if err != sl.ERROR_CODE.SUCCESS:
         exit(1)
+
+    logger.debug("Camera loaded!")
 
     # Enable positional tracking with default parameters
     py_transform = sl.Transform()  # First create a Transform object for TrackingParameters object
