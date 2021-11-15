@@ -129,53 +129,61 @@ class ZEDCameraCoordinateTransformation(object):
 
         """
         logger.debug(f"about to tramsform to global ned")
-        quaternion = [
-            data.rotation.w,
-            data.rotation.x,
-            data.rotation.y,
-            data.rotation.z,
-        ]
-        logger.debug(f"retrieved quaternon")
+        try:
+            quaternion = [
+                data.rotation.w,
+                data.rotation.x,
+                data.rotation.y,
+                data.rotation.z,
+            ]
+            logger.debug(f"retrieved quaternon")
 
-        position = [
-            data.translation.x * 100,
-            data.translation.y * 100,
-            data.translation.z * 100,
-        ]  # cm
-        logger.debug(f"retrieved translation")
+            position = [
+                data.translation.x * 100,
+                data.translation.y * 100,
+                data.translation.z * 100,
+            ]  # cm
+            logger.debug(f"retrieved translation")
 
-        velocity = np.transpose(
-            [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
-        )  # cm/s
-        
-        logger.debug("vio extracted velocity camera data")
-        H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
-            position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
-        )
-        self.tm["H_ZEDCAMRef_ZEDCAMBody"] = H_ZEDCAMRef_ZEDCAMBody
+            velocity = np.transpose(
+                [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
+            )  # cm/s
+            
+            logger.debug("vio extracted velocity camera data")
+            H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
+                position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
+            )
+            self.tm["H_ZEDCAMRef_ZEDCAMBody"] = H_ZEDCAMRef_ZEDCAMBody
 
-        H_aeroRef_aeroBody = self.tm["H_aeroRef_ZEDCAMRef"].dot(
-            self.tm["H_ZEDCAMRef_ZEDCAMBody"].dot(self.tm["H_ZEDCAMBody_aeroBody"])
-        )
-        self.tm["H_aeroRef_aeroBody"] = H_aeroRef_aeroBody
+            H_aeroRef_aeroBody = self.tm["H_aeroRef_ZEDCAMRef"].dot(
+                self.tm["H_ZEDCAMRef_ZEDCAMBody"].dot(self.tm["H_ZEDCAMBody_aeroBody"])
+            )
+            self.tm["H_aeroRef_aeroBody"] = H_aeroRef_aeroBody
 
-        H_aeroRefSync_aeroBody = self.tm["H_aeroRefSync_aeroRef"].dot(
-            H_aeroRef_aeroBody
-        )
-        self.tm["H_aeroRefSync_aeroBody"] = H_aeroRefSync_aeroBody
+            H_aeroRefSync_aeroBody = self.tm["H_aeroRefSync_aeroRef"].dot(
+                H_aeroRef_aeroBody
+            )
+            self.tm["H_aeroRefSync_aeroBody"] = H_aeroRefSync_aeroBody
 
-        T, R, Z, S = t3d.affines.decompose44(H_aeroRefSync_aeroBody)
-        eul = t3d.euler.mat2euler(R, axes="rxyz")
+            T, R, Z, S = t3d.affines.decompose44(H_aeroRefSync_aeroBody)
+            eul = t3d.euler.mat2euler(R, axes="rxyz")
 
-        H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
+            H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
 
-        logger.debug ("About to transpose")
-        vel = np.transpose(H_vel.dot(velocity))
+            logger.debug ("About to transpose")
+            vel = np.transpose(H_vel.dot(velocity))
 
-        # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
-        #     translate[0], translate[1], translate[2], angles[0], angles[1], angles[2], vel[0], vel[1], vel[2]))
+            # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
+            #     translate[0], translate[1], translate[2], angles[0], angles[1], angles[2], vel[0], vel[1], vel[2]))
 
-        return T, vel, eul
+            return T, vel, eul
+        except OSError as err:
+            logger.debug("OS error: {0}".format(err))
+        except ValueError as err:
+            logger.debug(f"Could not convert data:  {err}, {type(err)}")
+        except BaseException as err:
+            logger.debug(f"Unexpected {err}, {type(err)}")
+            raise
 
 
 class VIO(object):
