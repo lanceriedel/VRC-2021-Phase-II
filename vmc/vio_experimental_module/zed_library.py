@@ -104,14 +104,14 @@ class ZEDCamera(object):
     #           print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
-                #Display the IMU angular velocity
+                #Display the IMU linear velocity
                 a_velocity = [0,0,0]
-                self.zed_imu.get_angular_velocity(a_velocity)
+                self.zed_imu.linear_acceleration(a_velocity)
                 #vx = (a_velocity[0], 3)
                 #vy = (a_velocity[1], 3)
                 #vz = (a_velocity[2], 3)
-                #print("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
-                #logger.debug("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
+                #print("IMU Linear Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
+                #logger.debug("IMU Linear Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
 
                 # Display the IMU orientation quaternion
     #           self.zed_imu_pose = sl.Transform()
