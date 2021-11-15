@@ -84,18 +84,21 @@ class ZEDCamera(object):
                 
                 logger.debug(f"Zed translation x {self.zed_pose.get_translation(py_translation).get()[0]}")
                 logger.debug(f"Zed translation {self.zed_pose.get_translation(py_translation)}")
-                tx = (self.zed_pose.get_translation(py_translation).get()[0], 3)
-                ty = (self.zed_pose.get_translation(py_translation).get()[1], 3)
-                tz = (self.zed_pose.get_translation(py_translation).get()[2], 3)
+                logger.debug(f"Zed translation {self.zed_pose.get_translation(py_translation).get_infos()}")
+
+        
+                tx = self.zed_pose.get_translation(py_translation).get()[0]
+                ty = self.zed_pose.get_translation(py_translation).get()[1]
+                tz = self.zed_pose.get_translation(py_translation).get()[2]
                 logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
                 print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
 
                 # Display the orientation quaternion
                 py_orientation = sl.Orientation()
-                ox = (self.zed_pose.get_orientation(py_orientation).get()[0], 3)
-                oy = (self.zed_pose.get_orientation(py_orientation).get()[1], 3)
-                oz = (self.zed_pose.get_orientation(py_orientation).get()[2], 3)
-                ow = (self.zed_pose.get_orientation(py_orientation).get()[3], 3)
+                ox = self.zed_pose.get_orientation(py_orientation).get()[0]
+                oy = self.zed_pose.get_orientation(py_orientation).get()[1]
+                oz = self.zed_pose.get_orientation(py_orientation).get()[2]
+                ow = self.zed_pose.get_orientation(py_orientation).get()[3]
                 print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 logger.debug("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 
@@ -129,7 +132,7 @@ class ZEDCamera(object):
             #assemble return value
                 rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
                 translation =   {"x" : tx, "y" : ty, "z" : tz}
-                velocity = {"x" : 0, "y" : 0, "z" : 0}
+                velocity = {"x" : vx, "y" : vy, "z" : vz}
                 data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
 
                 return data

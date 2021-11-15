@@ -139,7 +139,7 @@ class ZEDCameraCoordinateTransformation(object):
                 data['rotation']['y'],
                 data['rotation']['z']
             ]
-            logger.debug(f"retrieved quaternon")
+            logger.debug(f"retrieved quaternon: {quaternion}")
 
             position = [
                 data['translation']['x'] * 100,
