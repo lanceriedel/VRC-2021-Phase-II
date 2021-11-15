@@ -129,43 +129,39 @@ class ZEDCameraCoordinateTransformation(object):
             The euler representation of the vehicle attitude. A 3 unit list [roll, pitch, yaw]
 
         """
-        logger.debug(f"about to tramsform to global ned {data}")
-        for key, value in data.items():
-            logger.debug( f"{key}, {value}")
+       # logger.debug(f"about to tramsform to global ned {data}")
+       # for key, value in data.items():
+       #     logger.debug( f"{key}, {value}")
         try:
             quaternion = data['rotation']
-                #data['rotation'],
-                #data['rotation']['x'],
-                #data['rotation']['y'],
-                #data['rotation']['z']
-            #]
-            logger.debug(f"retrieved quaternon: {quaternion}")
+               
+            #logger.debug(f"retrieved quaternon: {quaternion}")
 
             position = [
                 data['translation']['x'] * 100,
                 data['translation']['y'] * 100,
                 data['translation']['z'] * 100,
             ]  # cm
-            logger.debug(f"retrieved translation")
+           # logger.debug(f"retrieved translation")
 
             velocity = np.transpose(
                 [data['velocity'][0] * 100, data['velocity'][1] * 100, data['velocity'][2] * 100, 0]
             )  # cm/s
             
-            logger.debug("vio extracted velocity camera data")
+            #logger.debug("vio extracted velocity camera data")
             H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
                 position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
             )
 
 
-            logger.debug("CamRef -> CamBody")
+            #logger.debug("CamRef -> CamBody")
             self.tm["H_ZEDCAMRef_ZEDCAMBody"] = H_ZEDCAMRef_ZEDCAMBody
 
             H_aeroRef_aeroBody = self.tm["H_aeroRef_ZEDCAMRef"].dot(
                 self.tm["H_ZEDCAMRef_ZEDCAMBody"].dot(self.tm["H_ZEDCAMBody_aeroBody"])
             )
 
-            logger.debug("aeroref -> aerobody")
+            #logger.debug("aeroref -> aerobody")
             self.tm["H_aeroRef_aeroBody"] = H_aeroRef_aeroBody
 
             H_aeroRefSync_aeroBody = self.tm["H_aeroRefSync_aeroRef"].dot(
@@ -178,10 +174,10 @@ class ZEDCameraCoordinateTransformation(object):
 
             H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
 
-            logger.debug ("About to transpose")
+            #logger.debug ("About to transpose")
             vel = np.transpose(H_vel.dot(velocity))
 
-            logger.debug ("Done.. returning transformed values")
+            #logger.debug ("Done.. returning transformed values")
 
 
             # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
@@ -304,7 +300,7 @@ class VIO(object):
         #start the loop
         logger.debug("Beginning data loop")
         while True:
-            logger.debug("In pipe data loop")
+            #logger.debug("In pipe data loop")
 
             data = self.zedcamera.get_pipe_data()
             if data is not None:
@@ -312,8 +308,8 @@ class VIO(object):
                 ned_pos, ned_vel, rpy = self.coord_trans.transform_zedcamera_to_global_ned(
                     data
                 )
-                logger.debug("Publishing updates")
-                logger.debug(f"Publishing updates:{ned_pos},{ned_vel},{rpy}")
+                #logger.debug("Publishing updates")
+                #logger.debug(f"Publishing updates:{ned_pos},{ned_vel},{rpy}")
                 try:
                     self.publish_updates(
                         ned_pos,
