@@ -10,14 +10,14 @@ from colored import fore, back, style
 from loguru import logger
 
 try:
-    from t265_library import T265 # type: ignore
+    from zed_library import ZEDCAM # type: ignore
 except ImportError:
-    from .t265_library import T265
+    from .zed_library import ZEDCAM
 
-class T265CoordinateTransformation(object):
+class ZEDCAMCoordinateTransformation(object):
     """
     This class handles all the coordinate transformations we need to use to get
-    relevant data from the Intel Realsense T265 camera
+    relevant data from the Intel Realsense ZEDCAM camera
     """
 
     def __init__(self):
@@ -27,7 +27,7 @@ class T265CoordinateTransformation(object):
         sensor_att_in_aeroBody = [0, -pi / 2, pi / 2]  # rad [-pi, pi]
         sensor_height_off_ground = 10  # cm
 
-        H_aeroBody_T265Body = t3d.affines.compose(
+        H_aeroBody_ZEDCAMBody = t3d.affines.compose(
             sensor_pos_in_aeroBody,
             t3d.euler.euler2mat(
                 sensor_att_in_aeroBody[0],
@@ -37,12 +37,12 @@ class T265CoordinateTransformation(object):
             ),
             [1, 1, 1],
         )
-        self.tm["H_aeroBody_T265Body"] = H_aeroBody_T265Body
-        self.tm["H_T265Body_aeroBody"] = np.linalg.inv(H_aeroBody_T265Body)
+        self.tm["H_aeroBody_ZEDCAMBody"] = H_aeroBody_ZEDCAMBody
+        self.tm["H_ZEDCAMBody_aeroBody"] = np.linalg.inv(H_aeroBody_ZEDCAMBody)
 
         pos = sensor_pos_in_aeroBody
         pos[2] = -1 * sensor_height_off_ground
-        H_aeroRef_T265Ref = t3d.affines.compose(
+        H_aeroRef_ZEDCAMRef = t3d.affines.compose(
             pos,
             t3d.euler.euler2mat(
                 sensor_att_in_aeroBody[0],
@@ -52,7 +52,7 @@ class T265CoordinateTransformation(object):
             ),
             [1, 1, 1],
         )
-        self.tm["H_aeroRef_T265Ref"] = H_aeroRef_T265Ref
+        self.tm["H_aeroRef_ZEDCAMRef"] = H_aeroRef_ZEDCAMRef
 
         H_aeroRefSync_aeroRef = np.eye(4)
         self.tm["H_aeroRefSync_aeroRef"] = H_aeroRefSync_aeroRef
@@ -64,7 +64,7 @@ class T265CoordinateTransformation(object):
 
     def sync(self, heading_ref, pos_ref):
         """
-        Computes offsets between t265 ref and "global" frames, to align coord. systems
+        Computes offsets between zedcamera ref and "global" frames, to align coord. systems
         """
         rad2deg = 180 / pi
         deg2rad = pi / 180
@@ -84,7 +84,7 @@ class T265CoordinateTransformation(object):
         # compute the difference between our global reference, and what our sensor is reading for heading
         heading_offset = heading_ref - (heading * rad2deg)
         logger.debug(
-            f"{fore.CYAN_2}T265: Resync: Heading Offset:{heading_offset}{style.RESET}"  # type: ignore
+            f"{fore.CYAN_2}ZEDCAM: Resync: Heading Offset:{heading_offset}{style.RESET}"  # type: ignore
         )
 
         # build a rotation matrix about the global Z axis to apply the heading offset we computed
@@ -94,14 +94,14 @@ class T265CoordinateTransformation(object):
             [1, 1, 1],
         )
 
-        # apply the heading correction to the position data the T265 is providing
+        # apply the heading correction to the position data the ZEDCAM is providing
         H = H_rot_correction.dot(H)
         T, R, Z, S = t3d.affines.decompose44(H)
         eul = t3d.euler.mat2euler(R, axes="rxyz")
 
         ## Find the position offset
         pos_offset = [pos_ref["n"] - T[0], pos_ref["e"] - T[1], pos_ref["d"] - T[2]]
-        logger.debug(f"{fore.CYAN_2}T265: Resync: Pos offset:{pos_offset}{style.RESET}")  # type: ignore
+        logger.debug(f"{fore.CYAN_2}ZEDCAM: Resync: Pos offset:{pos_offset}{style.RESET}")  # type: ignore
 
         # build a translation matrix that corrects the difference between where the sensor thinks we are and were our reference thinks we are
         H_aeroRefSync_aeroRef = t3d.affines.compose(
@@ -109,14 +109,14 @@ class T265CoordinateTransformation(object):
         )
         self.tm["H_aeroRefSync_aeroRef"] = H_aeroRefSync_aeroRef
 
-    def transform_t265_to_global_ned(self, data):
+    def transform_zedcamera_to_global_ned(self, data):
         """
-        Takes in raw sensor data from the t265 frame, does the necessary transformations between the sensor, vehicle, and reference frames to
+        Takes in raw sensor data from the zedcamera frame, does the necessary transformations between the sensor, vehicle, and reference frames to
         present the sensor data in the "global" NED reference frame.
 
         Arguments:
         --------------------------
-        data : T265 Frame data
+        data : ZEDCAM Frame data
 
         Returns:
         --------------------------
@@ -143,13 +143,13 @@ class T265CoordinateTransformation(object):
             [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
         )  # cm/s
 
-        H_T265Ref_T265Body = t3d.affines.compose(
+        H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
             position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
         )
-        self.tm["H_T265Ref_T265Body"] = H_T265Ref_T265Body
+        self.tm["H_ZEDCAMRef_ZEDCAMBody"] = H_ZEDCAMRef_ZEDCAMBody
 
-        H_aeroRef_aeroBody = self.tm["H_aeroRef_T265Ref"].dot(
-            self.tm["H_T265Ref_T265Body"].dot(self.tm["H_T265Body_aeroBody"])
+        H_aeroRef_aeroBody = self.tm["H_aeroRef_ZEDCAMRef"].dot(
+            self.tm["H_ZEDCAMRef_ZEDCAMBody"].dot(self.tm["H_ZEDCAMBody_aeroBody"])
         )
         self.tm["H_aeroRef_aeroBody"] = H_aeroRef_aeroBody
 
@@ -161,10 +161,10 @@ class T265CoordinateTransformation(object):
         T, R, Z, S = t3d.affines.decompose44(H_aeroRefSync_aeroBody)
         eul = t3d.euler.mat2euler(R, axes="rxyz")
 
-        H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_T265Ref"])
+        H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
         vel = np.transpose(H_vel.dot(velocity))
 
-        # print("T265: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
+        # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
         #     translate[0], translate[1], translate[2], angles[0], angles[1], angles[2], vel[0], vel[1], vel[2]))
 
         return T, vel, eul
@@ -176,16 +176,16 @@ class VIO(object):
         self.init = False
         self.continuous_sync = True
 
-        self.t265 = T265()
-        self.T265_UPDATE_FREQ = 10
+        self.zedcamera = ZEDCamera()
+        self.ZEDCamera_UPDATE_FREQ = 10
 
-        self.coord_trans = T265CoordinateTransformation()
+        self.coord_trans = ZEDCameraCoordinateTransformation()
 
         self.mqtt_client = mqtt_client
         self.topic_prefix = "vrc/vio"
 
     def handle_resync(self, msg: dict):
-        # whenever new data is published to the t265 resync topic, we need to compute a new correction
+        # whenever new data is published to the ZEDCamera resync topic, we need to compute a new correction
         # to compensate for sensor drift over time.
         # TODO - make sure this is what the message looks like
         if self.init_sync == False or self.continuous_sync == True:
@@ -211,7 +211,7 @@ class VIO(object):
                     qos=0,
                 )
             else:
-                raise ValueError("T265 has NaNs for position")
+                raise ValueError("ZEDCamera has NaNs for position")
 
             if not np.isnan(rpy).any():
                 deg = [rad * 180 / pi for rad in rpy]
@@ -222,7 +222,7 @@ class VIO(object):
                     retain=False,
                     qos=0,
                 )
-                # print(fore.CYAN_2 + "T265: Heading: {}".format(eul_update["eul"]["phi"]), style.RESET)
+                # print(fore.CYAN_2 + "ZEDCamera: Heading: {}".format(eul_update["eul"]["phi"]), style.RESET)
 
                 heading = rpy[2]
                 if heading < 0:
@@ -237,7 +237,7 @@ class VIO(object):
                 )
                 # coord_trans.heading = rpy[2]
             else:
-                raise ValueError("T265 has NaNs for orientation")
+                raise ValueError("ZEDCAM has NaNs for orientation")
 
             if not np.isnan(ned_vel).any():
                 vel_update = {"n": ned_vel[0], "e": ned_vel[1], "d": ned_vel[2]}
@@ -248,7 +248,7 @@ class VIO(object):
                     qos=0,
                 )
             else:
-                raise ValueError("T265 has NaNs for velocity")
+                raise ValueError("ZEDCAM has NaNs for velocity")
 
             mapper_tracker = {
                 "mapper": mapper_confidence,
@@ -265,17 +265,17 @@ class VIO(object):
 
     def run(self):
 
-        #setup the t265
-        logger.debug("Setting up T265")
-        self.t265.setup()
+        #setup the zedcamera
+        logger.debug("Setting up ZEDCAM")
+        self.zedcamera.setup()
 
         #start the loop
         logger.debug("Beginning data loop")
         while True:
-            data = self.t265.get_pipe_data()
+            data = self.zedcamera.get_pipe_data()
             if data is not None:
                 # collect data from the sensor and transform it into "global" NED frame
-                ned_pos, ned_vel, rpy = self.coord_trans.transform_t265_to_global_ned(
+                ned_pos, ned_vel, rpy = self.coord_trans.transform_zedcamera_to_global_ned(
                     data
                 )
 
@@ -289,4 +289,4 @@ class VIO(object):
             else:
                 continue
 
-            time.sleep(1 / self.T265_UPDATE_FREQ)
+            time.sleep(1 / self.ZEDCAM_UPDATE_FREQ)
