@@ -49,8 +49,11 @@ class ZEDCamera(object):
             # Track the camera position during 1000 frames
             i = 0
             self.zed_pose = sl.Pose()
-
             self.zed_sensors = sl.SensorsData()
+            self.zed.get_position(self.zed_pose, sl.REFERENCE_FRAME.WORLD)
+            self.zed.get_sensors_data(self.zed_sensors, sl.TIME_REFERENCE.IMAGE)
+            self.zed_imu = self.zed_sensors.get_imu_data()
+
             self.runtime_parameters = sl.RuntimeParameters()
 
         except Exception as e:
@@ -70,7 +73,7 @@ class ZEDCamera(object):
                 self.zed.get_sensors_data(self.zed_sensors, sl.TIME_REFERENCE.IMAGE)
                 logger.debug("Zed Camera Successfully got sensor data")
 
-                zed_imu = self.zed_sensors.get_imu_data()
+                self.zed_imu = self.zed_sensors.get_imu_data()
 
                 logger.debug("Zed Camera Successfuly get imu data")
 
@@ -123,7 +126,7 @@ class ZEDCamera(object):
             #assemble return value
                 rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
                 translation =   {"x" : tx, "y" : ty, "z" : tz}
-                velocity = {"x" : 0, "y" : 0, "z" : 0};
+                velocity = {"x" : 0, "y" : 0, "z" : 0}
                 data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
 
                 return data
