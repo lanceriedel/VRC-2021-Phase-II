@@ -128,25 +128,27 @@ class ZEDCameraCoordinateTransformation(object):
             The euler representation of the vehicle attitude. A 3 unit list [roll, pitch, yaw]
 
         """
-        logger.debug(f"about to tramsform to global ned")
+        logger.debug(f"about to tramsform to global ned {data}")
+        for key, value in data.items():
+            logger.debug( f"{key}, {value}")
         try:
             quaternion = [
-                data.rotation.w,
-                data.rotation.x,
-                data.rotation.y,
-                data.rotation.z,
+                data['rotation']['w'],
+                data['rotation']['x'],
+                data['rotation']['y'],
+                data['rotation']['z']
             ]
             logger.debug(f"retrieved quaternon")
 
             position = [
-                data.translation.x * 100,
-                data.translation.y * 100,
-                data.translation.z * 100,
+                data['translation']['x'] * 100,
+                data['translation']['y'] * 100,
+                data['translation']['z'] * 100,
             ]  # cm
             logger.debug(f"retrieved translation")
 
             velocity = np.transpose(
-                [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
+                [data['velocity']['x'] * 100, data['velocity']['y'] * 100, data['velocity']['z'] * 100, 0]
             )  # cm/s
             
             logger.debug("vio extracted velocity camera data")
@@ -183,6 +185,8 @@ class ZEDCameraCoordinateTransformation(object):
             logger.debug(f"Could not convert data:  {err}, {type(err)}")
         except BaseException as err:
             logger.debug(f"Unexpected {err}, {type(err)}")
+            traceback.print_exc()
+            logging.exception("")
             raise
 
 
