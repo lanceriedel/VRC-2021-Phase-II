@@ -61,96 +61,106 @@ class ZEDCamera(object):
         logger.debug("Getting pipe data")    
             #Ok if returns none if not available -- will get called again
         if self.zed.grab(self.runtime_parameters) == sl.ERROR_CODE.SUCCESS:
-            logger.debug("Zed Camera Successfully grabbed params")
-            # Get the pose of the left eye of the camera with reference to the world frame
-            self.zed.get_position(self.zed_pose, sl.REFERENCE_FRAME.WORLD)
-            logger.debug("Zed Camera Successfully go position data")
+            try:
+                logger.debug("Zed Camera Successfully grabbed params")
+                # Get the pose of the left eye of the camera with reference to the world frame
+                self.zed.get_position(self.zed_pose, sl.REFERENCE_FRAME.WORLD)
+                logger.debug("Zed Camera Successfully go position data")
 
-            self.zed.get_sensors_data(self.zed_sensors, sl.TIME_REFERENCE.IMAGE)
-            logger.debug("Zed Camera Successfully got sensor data")
+                self.zed.get_sensors_data(self.zed_sensors, sl.TIME_REFERENCE.IMAGE)
+                logger.debug("Zed Camera Successfully got sensor data")
 
-            zed_imu = self.zed_sensors.get_imu_data()
+                zed_imu = self.zed_sensors.get_imu_data()
 
-            logger.debug("Zed Camera Successfuly get imu data")
+                logger.debug("Zed Camera Successfuly get imu data")
 
-            # Display the translation and timestamp
-            py_translation = sl.Translation()
-            logger.debug("Zed Camera Successfully retrieved Translation")
+                # Display the translation and timestamp
+                py_translation = sl.Translation()
+                logger.debug("Zed Camera Successfully retrieved Translation")
 
-            tx = (self.zed_pose.get_translation(py_translation).get()[0], 3)
-            ty = (self.zed_pose.get_translation(py_translation).get()[1], 3)
-            tz = (self.zed_pose.get_translation(py_translation).get()[2], 3)
-            logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
-            print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
+                tx = (self.zed_pose.get_translation(py_translation).get()[0], 3)
+                ty = (self.zed_pose.get_translation(py_translation).get()[1], 3)
+                tz = (self.zed_pose.get_translation(py_translation).get()[2], 3)
+                logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
+                print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
 
-            # Display the orientation quaternion
-            py_orientation = sl.Orientation()
-            ox = (self.zed_pose.get_orientation(py_orientation).get()[0], 3)
-            oy = (self.zed_pose.get_orientation(py_orientation).get()[1], 3)
-            oz = (self.zed_pose.get_orientation(py_orientation).get()[2], 3)
-            ow = (self.zed_pose.get_orientation(py_orientation).get()[3], 3)
-            print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
-            logger.debug("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
-            
-            #Display the IMU acceleratoin
- #           acceleration = [0,0,0]
- #           self.zed_imu.get_linear_acceleration(acceleration)
- #           ax = (acceleration[0], 3)
- #           ay = (acceleration[1], 3)
- #           az = (acceleration[2], 3)
- #           print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
- #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
-            
-            #Display the IMU angular velocity
- #           a_velocity = [0,0,0]
- #           self.zed_imu.get_angular_velocity(a_velocity)
- #           vx = (a_velocity[0], 3)
- #           vy = (a_velocity[1], 3)
- #           vz = (a_velocity[2], 3)
- #           print("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
- #           logger.debug("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
+                # Display the orientation quaternion
+                py_orientation = sl.Orientation()
+                ox = (self.zed_pose.get_orientation(py_orientation).get()[0], 3)
+                oy = (self.zed_pose.get_orientation(py_orientation).get()[1], 3)
+                oz = (self.zed_pose.get_orientation(py_orientation).get()[2], 3)
+                ow = (self.zed_pose.get_orientation(py_orientation).get()[3], 3)
+                print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+                logger.debug("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+                
+                #Display the IMU acceleratoin
+    #           acceleration = [0,0,0]
+    #           self.zed_imu.get_linear_acceleration(acceleration)
+    #           ax = (acceleration[0], 3)
+    #           ay = (acceleration[1], 3)
+    #           az = (acceleration[2], 3)
+    #           print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
+    #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
+                
+                #Display the IMU angular velocity
+                a_velocity = [0,0,0]
+                self.zed_imu.get_angular_velocity(a_velocity)
+                vx = (a_velocity[0], 3)
+                vy = (a_velocity[1], 3)
+                vz = (a_velocity[2], 3)
+                print("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
+                logger.debug("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
 
-            # Display the IMU orientation quaternion
- #           self.zed_imu_pose = sl.Transform()
- #           ox = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[0], 3)
- #           oy = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[1], 3)
- #           oz = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[2], 3)
- #           ow = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[3], 3)
- #           print("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
- #           logger.debug("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+                # Display the IMU orientation quaternion
+    #           self.zed_imu_pose = sl.Transform()
+    #           ox = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[0], 3)
+    #           oy = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[1], 3)
+    #           oz = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[2], 3)
+    #           ow = (zed_imu.get_pose(self.zed_imu_pose).get_orientation().get()[3], 3)
+    #           print("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+    #           logger.debug("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
 
-        #assemble return value
-            rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
-            translation =   {"x" : tx, "y" : ty, "z" : tz}
-            velocity = {"x" : 0, "y" : 0, "z" : 0};
-            data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
+            #assemble return value
+                rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
+                translation =   {"x" : tx, "y" : ty, "z" : tz}
+                velocity = {"x" : 0, "y" : 0, "z" : 0};
+                data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
 
-            return data
-#quaternion = [
- #           data.rotation.w,
-  #          data.rotation.x,
-  #          data.rotation.y,
-  #          data.rotation.z,
-  #      ]
-  #      position = [
-  #          data.translation.x * 100,
-  #          data.translation.y * 100,
-  #          data.translation.z * 100,
-  #      ]  # cm
-  #      velocity = np.transpose(
-  #          [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
-  #      )  # cm/s
-  #      data.tracker_confidence,   -- Pose confidence 0x0 - Failed, 0x1 - Low, 0x2 - Medium, 0x3 - High
-  #      data.mapper_confidence,    --Pose map confidence 0x0 - Failed, 0x1 - Low, 0x2 - Medium, 0x3 - High'
+                return data
+
+                    #  print("IMU Angular Velocity: {} [deg/sec]".format(angular_velocity))
+            except OSError as err:
+                logger.debug("OS error: {0}".format(err))
+            except ValueError as err:
+                logger.debug(f"Could not convert data:  {err=}, {type(err)=}")
+            except BaseException as err:
+                logger.debug(f"Unexpected {err=}, {type(err)=}")
+                raise
+    #quaternion = [
+    #           data.rotation.w,
+    #          data.rotation.x,
+    #          data.rotation.y,
+    #          data.rotation.z,
+    #      ]
+    #      position = [
+    #          data.translation.x * 100,
+    #          data.translation.y * 100,
+    #          data.translation.z * 100,
+    #      ]  # cm
+    #      velocity = np.transpose(
+    #          [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
+    #      )  # cm/s
+    #      data.tracker_confidence,   -- Pose confidence 0x0 - Failed, 0x1 - Low, 0x2 - Medium, 0x3 - High
+    #      data.mapper_confidence,    --Pose map confidence 0x0 - Failed, 0x1 - Low, 0x2 - Medium, 0x3 - High'
 
 
- # if ts_handler.is_new(sensors_data.get_imu_data()):
-  #  quaternion = sensors_data.get_imu_data().get_pose().get_orientation().get()
-  #  print("IMU Orientation: {}".format(quaternion))
-  #  linear_acceleration = sensors_data.get_imu_data().get_linear_acceleration()
-  #  print("IMU Acceleration: {} [m/sec^2]".format(linear_acceleration))
-  #  angular_velocity = sensors_data.get_imu_data().get_angular_velocity()
-  #  print("IMU Angular Velocity: {} [deg/sec]".format(angular_velocity))
+    # if ts_handler.is_new(sensors_data.get_imu_data()):
+    #  quaternion = sensors_data.get_imu_data().get_pose().get_orientation().get()
+    #  print("IMU Orientation: {}".format(quaternion))
+    #  linear_acceleration = sensors_data.get_imu_data().get_linear_acceleration()
+    #  print("IMU Acceleration: {} [m/sec^2]".format(linear_acceleration))
+    #  angular_velocity = sensors_data.get_imu_data().get_angular_velocity()
+
 
 
 
