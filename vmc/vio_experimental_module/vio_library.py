@@ -61,6 +61,7 @@ class ZEDCameraCoordinateTransformation(object):
             [0, 0, 0], t3d.euler.euler2mat(pi, 0, 0), [1, 1, 1]
         )
         self.tm["H_nwu_aeroRef"] = H_nwu_aeroRef
+        logger.debug("INIT ZEDCameraCoordinateTransformation")
 
     def sync(self, heading_ref, pos_ref):
         """
@@ -155,11 +156,16 @@ class ZEDCameraCoordinateTransformation(object):
             H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
                 position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
             )
+
+
+            logger.debug("CamRef -> CamBody")
             self.tm["H_ZEDCAMRef_ZEDCAMBody"] = H_ZEDCAMRef_ZEDCAMBody
 
             H_aeroRef_aeroBody = self.tm["H_aeroRef_ZEDCAMRef"].dot(
                 self.tm["H_ZEDCAMRef_ZEDCAMBody"].dot(self.tm["H_ZEDCAMBody_aeroBody"])
             )
+
+            logger.debug("aeroref -> aerobody")
             self.tm["H_aeroRef_aeroBody"] = H_aeroRef_aeroBody
 
             H_aeroRefSync_aeroBody = self.tm["H_aeroRefSync_aeroRef"].dot(

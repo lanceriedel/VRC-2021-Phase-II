@@ -81,6 +81,9 @@ class ZEDCamera(object):
                 py_translation = sl.Translation()
                 logger.debug("Zed Camera Successfully retrieved Translation")
 
+                
+                logger.debug(f"Zed translation x {self.zed_pose.get_translation(py_translation).get()[0]}")
+                logger.debug(f"Zed translation {self.zed_pose.get_translation(py_translation)}")
                 tx = (self.zed_pose.get_translation(py_translation).get()[0], 3)
                 ty = (self.zed_pose.get_translation(py_translation).get()[1], 3)
                 tz = (self.zed_pose.get_translation(py_translation).get()[2], 3)
