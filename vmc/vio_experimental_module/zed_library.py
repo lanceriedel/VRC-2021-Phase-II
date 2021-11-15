@@ -84,7 +84,6 @@ class ZEDCamera(object):
                 
                 logger.debug(f"Zed translation x {self.zed_pose.get_translation(py_translation).get()[0]}")
                 logger.debug(f"Zed translation {self.zed_pose.get_translation(py_translation)}")
-                logger.debug(f"Zed translation {self.zed_pose.get_translation(py_translation).get_infos()}")
 
         
                 tx = self.zed_pose.get_translation(py_translation).get()[0]
@@ -99,7 +98,7 @@ class ZEDCamera(object):
                 oy = self.zed_pose.get_orientation(py_orientation).get()[1]
                 oz = self.zed_pose.get_orientation(py_orientation).get()[2]
                 ow = self.zed_pose.get_orientation(py_orientation).get()[3]
-                rotation = self.zed_pose.get_orientation(py_orientation)
+                #rotation = self.zed_pose.get_orientation(py_orientation).get_rotation_matrix()
                 print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 logger.debug("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 
@@ -132,8 +131,9 @@ class ZEDCamera(object):
 
             #assemble return value
                 #rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
+                rotation = self.zed_pose.get_orientation(py_orientation).get()
                 translation =   {"x" : tx, "y" : ty, "z" : tz}
-                velocity = {"x" : vx, "y" : vy, "z" : vz}
+                velocity = a_velocity
                 data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
 
                 return data

@@ -133,12 +133,12 @@ class ZEDCameraCoordinateTransformation(object):
         for key, value in data.items():
             logger.debug( f"{key}, {value}")
         try:
-            quaternion = [
-                data['rotation']['w'],
-                data['rotation']['x'],
-                data['rotation']['y'],
-                data['rotation']['z']
-            ]
+            quaternion = data['rotation']
+                #data['rotation'],
+                #data['rotation']['x'],
+                #data['rotation']['y'],
+                #data['rotation']['z']
+            #]
             logger.debug(f"retrieved quaternon: {quaternion}")
 
             position = [
@@ -149,7 +149,7 @@ class ZEDCameraCoordinateTransformation(object):
             logger.debug(f"retrieved translation")
 
             velocity = np.transpose(
-                [data['velocity']['x'] * 100, data['velocity']['y'] * 100, data['velocity']['z'] * 100, 0]
+                [data['velocity'][0] * 100, data['velocity'][1] * 100, data['velocity'][2] * 100, 0]
             )  # cm/s
             
             logger.debug("vio extracted velocity camera data")
@@ -181,6 +181,9 @@ class ZEDCameraCoordinateTransformation(object):
             logger.debug ("About to transpose")
             vel = np.transpose(H_vel.dot(velocity))
 
+            logger.debug ("Done.. returning transformed values")
+
+
             # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
             #     translate[0], translate[1], translate[2], angles[0], angles[1], angles[2], vel[0], vel[1], vel[2]))
 
@@ -203,7 +206,7 @@ class VIO(object):
         self.continuous_sync = True
 
         self.zedcamera = ZEDCamera()
-        self.ZEDCamera_UPDATE_FREQ = 10
+        self.ZEDCAM_UPDATE_FREQ = 10
 
         self.coord_trans = ZEDCameraCoordinateTransformation()
 
@@ -224,7 +227,8 @@ class VIO(object):
         self, ned_pos, ned_vel, rpy, tracker_confidence, mapper_confidence
     ):
         try:
-
+            logger.debug(f"ZEDCamera publish updates - checking values")
+            logger.debug(f"ZEDCamera publish updates: {ned_pos}")
             if not np.isnan(ned_pos).any():
                 n = float(ned_pos[0])
                 e = float(ned_pos[1])
@@ -237,6 +241,8 @@ class VIO(object):
                     qos=0,
                 )
             else:
+                logger.debug(f"ZEDCamera has NaNs for position")
+
                 raise ValueError("ZEDCamera has NaNs for position")
 
             if not np.isnan(rpy).any():
@@ -298,20 +304,27 @@ class VIO(object):
         #start the loop
         logger.debug("Beginning data loop")
         while True:
+            logger.debug("In pipe data loop")
+
             data = self.zedcamera.get_pipe_data()
             if data is not None:
                 # collect data from the sensor and transform it into "global" NED frame
                 ned_pos, ned_vel, rpy = self.coord_trans.transform_zedcamera_to_global_ned(
                     data
                 )
-
-                self.publish_updates(
-                    ned_pos,
-                    ned_vel,
-                    rpy,
-                    data.tracker_confidence,
-                    data.mapper_confidence,
-                )
+                logger.debug("Publishing updates")
+                logger.debug(f"Publishing updates:{ned_pos},{ned_vel},{rpy}")
+                try:
+                    self.publish_updates(
+                        ned_pos,
+                        ned_vel,
+                        rpy,
+                        data["tracker_confidence"],
+                        data["mapper_confidence"]
+                    )
+                except BaseException as err:
+                    logger.debug(f"Unexpected {err}, {type(err)}")
+                    logger.debug("Didnt call publish")
             else:
                 continue
 
