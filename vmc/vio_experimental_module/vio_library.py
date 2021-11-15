@@ -223,8 +223,8 @@ class VIO(object):
         self, ned_pos, ned_vel, rpy, tracker_confidence, mapper_confidence
     ):
         try:
-            logger.debug(f"ZEDCamera publish updates - checking values")
-            logger.debug(f"ZEDCamera publish updates: {ned_pos}")
+            #logger.debug(f"ZEDCamera publish updates - checking values")
+            #logger.debug(f"ZEDCamera publish updates: {ned_pos}")
             if not np.isnan(ned_pos).any():
                 n = float(ned_pos[0])
                 e = float(ned_pos[1])
