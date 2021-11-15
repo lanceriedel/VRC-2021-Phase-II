@@ -10,11 +10,11 @@ from colored import fore, back, style
 from loguru import logger
 
 try:
-    from zed_library import ZEDCAM # type: ignore
+    from zed_library import ZEDCamera # type: ignore
 except ImportError:
-    from .zed_library import ZEDCAM
+    from .zed_library import ZEDCamera
 
-class ZEDCAMCoordinateTransformation(object):
+class ZEDCameraCoordinateTransformation(object):
     """
     This class handles all the coordinate transformations we need to use to get
     relevant data from the Intel Realsense ZEDCAM camera
@@ -128,21 +128,27 @@ class ZEDCAMCoordinateTransformation(object):
             The euler representation of the vehicle attitude. A 3 unit list [roll, pitch, yaw]
 
         """
+        logger.debug(f"about to tramsform to global ned")
         quaternion = [
             data.rotation.w,
             data.rotation.x,
             data.rotation.y,
             data.rotation.z,
         ]
+        logger.debug(f"retrieved quaternon")
+
         position = [
             data.translation.x * 100,
             data.translation.y * 100,
             data.translation.z * 100,
         ]  # cm
+        logger.debug(f"retrieved translation")
+
         velocity = np.transpose(
             [data.velocity.x * 100, data.velocity.y * 100, data.velocity.z * 100, 0]
         )  # cm/s
-
+        
+        logger.debug("vio extracted velocity camera data")
         H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
             position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
         )
@@ -162,6 +168,8 @@ class ZEDCAMCoordinateTransformation(object):
         eul = t3d.euler.mat2euler(R, axes="rxyz")
 
         H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
+
+        logger.debug ("About to transpose")
         vel = np.transpose(H_vel.dot(velocity))
 
         # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(

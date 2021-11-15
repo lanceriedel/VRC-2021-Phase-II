@@ -8,10 +8,10 @@ import time
 from loguru import logger
 import paho.mqtt.client as mqtt
 
-try:
-    from vio_library import VIO  # type: ignore
-except ImportError:
-    from .vio_library import VIO
+#try:
+from vio_library import VIO  # type: ignore
+#except ImportError:
+#    from .vio_library import VIO
 
 
 class VIOModule(object):
