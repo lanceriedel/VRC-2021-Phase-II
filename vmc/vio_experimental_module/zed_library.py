@@ -99,6 +99,7 @@ class ZEDCamera(object):
                 oy = self.zed_pose.get_orientation(py_orientation).get()[1]
                 oz = self.zed_pose.get_orientation(py_orientation).get()[2]
                 ow = self.zed_pose.get_orientation(py_orientation).get()[3]
+                rotation = self.zed_pose.get_orientation(py_orientation)
                 print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 logger.debug("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
                 
@@ -130,7 +131,7 @@ class ZEDCamera(object):
     #           logger.debug("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
 
             #assemble return value
-                rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
+                #rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
                 translation =   {"x" : tx, "y" : ty, "z" : tz}
                 velocity = {"x" : vx, "y" : vy, "z" : vz}
                 data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
