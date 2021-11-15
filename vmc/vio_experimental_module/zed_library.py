@@ -132,9 +132,9 @@ class ZEDCamera(object):
             except OSError as err:
                 logger.debug("OS error: {0}".format(err))
             except ValueError as err:
-                logger.debug(f"Could not convert data:  {err=}, {type(err)=}")
+                logger.debug(f"Could not convert data:  {err}, {type(err)}")
             except BaseException as err:
-                logger.debug(f"Unexpected {err=}, {type(err)=}")
+                logger.debug(f"Unexpected {err}, {type(err)}")
                 raise
     #quaternion = [
     #           data.rotation.w,
