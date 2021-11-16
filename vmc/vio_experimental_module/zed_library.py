@@ -53,6 +53,7 @@ class ZEDCamera(object):
             self.zed.get_position(self.zed_pose, sl.REFERENCE_FRAME.WORLD)
             self.zed.get_sensors_data(self.zed_sensors, sl.TIME_REFERENCE.IMAGE)
             self.zed_imu = self.zed_sensors.get_imu_data()
+            self.last_pos = [0,0,0]
 
             self.runtime_parameters = sl.RuntimeParameters()
 
@@ -104,8 +105,13 @@ class ZEDCamera(object):
     #           print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
-                #Display the IMU angular velocity
-                a_velocity = [0,0,0]
+                current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE)
+                diffx = abs(tx - self.last_pos[0])
+                diffy = abs(ty - self.last_pos[1])
+                diffz = abs(tz - self.last_pos[2])
+                time_diff = current_time - self.last_time 
+                a_velocity = [diffx/time_diff, diffy/time_diff, diffz/time_diff]
+                self.last_time = current_time
                 self.zed_imu.get_angular_velocity(a_velocity)
                 #vx = (a_velocity[0], 3)
                 #vy = (a_velocity[1], 3)
