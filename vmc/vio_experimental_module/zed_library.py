@@ -106,7 +106,7 @@ class ZEDCamera(object):
                 
                 #Display the IMU linear velocity
                 a_velocity = [0,0,0]
-                self.zed_imu.linear_acceleration(a_velocity)
+                self.zed_imu.get_linear_acceleration(a_velocity)
                 #vx = (a_velocity[0], 3)
                 #vy = (a_velocity[1], 3)
                 #vz = (a_velocity[2], 3)
