@@ -29,10 +29,11 @@ class ZEDCamera(object):
             init_params.coordinate_units = sl.UNIT.METER  # Set units in meters
 
             # Open the camera
+            logger.debug("Zed Camera Loading...")
             err = self.zed.open(init_params)
-            logger.debug("Zed Camera Loaded/open")
 
             if err != sl.ERROR_CODE.SUCCESS:
+                logger.debug("Zed Camera Loadng (FAILED!!!)")
                 exit(1)
             logger.debug("Zed Camera Loaded/open (Success)")
 
