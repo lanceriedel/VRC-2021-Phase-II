@@ -57,7 +57,7 @@ class ZEDCamera(object):
             self.last_pos = [0,0,0]
 
             self.runtime_parameters = sl.RuntimeParameters()
-
+            self.last_time = 0
         except Exception as e:
             logger.exception(f"{fore.RED}ZED: Error connecting to ZED Camera: {e}{style.RESET}")
             raise e
@@ -106,7 +106,7 @@ class ZEDCamera(object):
     #           print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
-                current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE)
+                current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_milliseconds()
                 diffx = abs(tx - self.last_pos[0])
                 diffy = abs(ty - self.last_pos[1])
                 diffz = abs(tz - self.last_pos[2])

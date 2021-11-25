@@ -182,7 +182,7 @@ class Sandbox():
 
     def send_color_by_distance_mesg(self,distance):
 
-            print(f"::::::Ready to send color DISTANCE msg: {distance} ") 
+            #print(f"::::::Ready to send color DISTANCE msg: {distance} ") 
             yellow = Color("yellow")
             colors = list(yellow.range_to(Color("purple"),30))
             sendcolor = [255, 255, 255, 255]
@@ -205,7 +205,7 @@ class Sandbox():
 
     def send_color_mesg(self, color):
 
-            print(f"::::::Ready to send color msg: {color} ") 
+            #print(f"::::::Ready to send color msg: {color} ") 
 
             blue = [255, 0, 0, 255]
             red = [255, 255, 0, 0]
@@ -213,7 +213,7 @@ class Sandbox():
             yellow = [255,255,255,0]
             orange = [255,255,40,0]
             purple = [255,138,0,139]
-
+            blank = [255,0,0,0]
 
             if color=='orange':
                 msg = {
@@ -235,6 +235,10 @@ class Sandbox():
                 msg = {
                         "wrgb": purple
                         }
+            elif color=='blank':
+                msg = {
+                        "wrgb": blank
+                        }
             else: 
                 msg = {
                         "wrgb": yellow
@@ -246,7 +250,7 @@ class Sandbox():
 
     def visible_apriltag(self,data: dict) -> None:
             #NOTE: this allows you to map tag id servo number -- (first slot is bogus because of 0 count e.g. tagid 1 = servo 0, tagid 2 = servo 1)  
-            tagidmap=[0, 0,1,3]
+            tagidmap=[0, 0,1,3,4,5,6,7,8,9,10,11,12,13]
 
 
             tag = data[0]
@@ -270,8 +274,8 @@ class Sandbox():
 
 
 
-                anglefromtag = angletotag #+180.0
-                if angletotag>360:
+                anglefromtag = angletotag  +180.0
+                if anglefromtag>360:
                   anglefromtag = anglefromtag - 360.0
                 anglefromtag = anglefromtag + heading
                 if anglefromtag > 360:
@@ -289,8 +293,11 @@ class Sandbox():
                 #    pixl_speed = 25
 
             
-            
-                which_pixel = (int)(((float)(anglefromtag/360.0))*32.0)
+                if (horizontal_dist>60):
+                    which_pixel = 64 #means no pointer pixel
+                    
+                else:
+                    which_pixel =  (int)(((float)(anglefromtag/360.0))*32.0)
                     #{"target_pixel":16,"delay_ms":250}
                     #vrc/pcc/set_pixel_cycle
                 datamsgpixl = {"target_pixel": which_pixel, "delay_ms": pixl_speed}
@@ -300,7 +307,9 @@ class Sandbox():
 
                 print(f"heading: {heading} ")
                 print(f"vertical_dist: {vertical_dist} ")
-                print(f"****** XXhorizontal_dist: {horizontal_dist} ")
+                print(f"horizontal_dist: {horizontal_dist} ")
+                print(f"<<< ANGLE TO TAG: {angletotag} ")
+                print(f">>> ANGLE FROM TAG: {anglefromtag} ")
                 
                 
                 if (horizontal_dist<5):
@@ -316,10 +325,12 @@ class Sandbox():
                     
 
 
-                elif (horizontal_dist>5):
-                    print(f"******------COLOR GRADIENT!!!!!!!!!!!!!****************")
-                    self.send_color_by_distance_mesg(horizontal_dist)  
                 
+                elif (horizontal_dist<40):
+                        #print(f"******------COLOR GRADIENT!!!!!!!!!!!!!****************")
+                    self.send_color_by_distance_mesg(horizontal_dist)  
+                else:
+                    self.send_color_mesg("blank")
             # elif (horizontal_dist>30):
                 #    self.send_color_mesg("orange")  
 
