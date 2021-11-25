@@ -270,7 +270,7 @@ class Sandbox():
 
 
 
-                anglefromtag = angletotag+180.0
+                anglefromtag = angletotag #+180.0
                 if angletotag>360:
                   anglefromtag = anglefromtag - 360.0
                 anglefromtag = anglefromtag + heading
