@@ -268,9 +268,14 @@ class Sandbox():
                 vertical_dist = tag["vertical_dist"] 
                 angletotag = tag["angle_to_tag"] 
 
+
+
                 anglefromtag = angletotag+180.0
                 if angletotag>360:
                   anglefromtag = anglefromtag - 360.0
+                anglefromtag = anglefromtag + heading
+                if anglefromtag > 360:
+                    anglefromtag = anglefromtag - 360.0
 
                 pixl_speed = 20
                 #pixl_speed =  int(horizontal_dist)
