@@ -84,7 +84,7 @@ class ZEDCamera(object):
                 tx = self.zed_pose.get_translation(py_translation).get()[0]
                 ty = self.zed_pose.get_translation(py_translation).get()[1]
                 tz = self.zed_pose.get_translation(py_translation).get()[2]
-                #logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
+                logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
                 #print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
 
                 # Display the orientation quaternion
@@ -107,13 +107,13 @@ class ZEDCamera(object):
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
                 current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_milliseconds()
-                diffx = abs(tx - self.last_pos[0])/100
-                diffy = abs(ty - self.last_pos[1])/100
-                diffz = abs(tz - self.last_pos[2])/100
+                diffx = abs(tx - self.last_pos[0])
+                diffy = abs(ty - self.last_pos[1])
+                diffz = abs(tz - self.last_pos[2])
                 time_diff =( current_time - self.last_time)*1000 
                 a_velocity = [diffx/time_diff, diffy/time_diff, diffz/time_diff]
                 self.last_time = current_time
-                self.zed_imu.get_angular_velocity(a_velocity)
+            
 
                 #vx = (a_velocity[0], 3)
                 #vy = (a_velocity[1], 3)
