@@ -107,10 +107,10 @@ class ZEDCamera(object):
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
                 current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_milliseconds()
-                diffx = abs(tx - self.last_pos[0])
-                diffy = abs(ty - self.last_pos[1])
-                diffz = abs(tz - self.last_pos[2])
-                time_diff = current_time - self.last_time 
+                diffx = abs(tx - self.last_pos[0])/100
+                diffy = abs(ty - self.last_pos[1])/100
+                diffz = abs(tz - self.last_pos[2])/100
+                time_diff =( current_time - self.last_time)*1000 
                 a_velocity = [diffx/time_diff, diffy/time_diff, diffz/time_diff]
                 self.last_time = current_time
                 self.zed_imu.get_angular_velocity(a_velocity)
