@@ -143,11 +143,11 @@ class ZEDCameraCoordinateTransformation(object):
                 data['translation']['z'] * 100,
             ]  # cm
            # logger.debug(f"retrieved translation")
-
+            logger.debug(f"VIO:raw velocity: {data['velocity']}")
             velocity = np.transpose(
                 [data['velocity'][0] * 100, data['velocity'][1] * 100, data['velocity'][2] * 100, 0]
             )  # cm/s
-            
+            logger.debug(f"VIO:transposed velocity: {velocity}")
             #logger.debug("vio extracted velocity camera data")
             H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
                 position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
@@ -176,6 +176,8 @@ class ZEDCameraCoordinateTransformation(object):
 
             #logger.debug ("About to transpose")
             vel = np.transpose(H_vel.dot(velocity))
+            logger.debug(f"VIO:final tansposed velocity: {data['velocity']}")
+
 
             #logger.debug ("Done.. returning transformed values")
 
