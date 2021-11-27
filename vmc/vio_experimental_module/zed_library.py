@@ -110,7 +110,7 @@ class ZEDCamera(object):
                 diffx = abs(tx - self.last_pos[0])
                 diffy = abs(ty - self.last_pos[1])
                 diffz = abs(tz - self.last_pos[2])
-                time_diff =( current_time - self.last_time)*1000 
+                time_diff =( current_time - self.last_time)/1000 
                 a_velocity = [diffx/time_diff, diffy/time_diff, diffz/time_diff]
                 self.last_time = current_time
             
