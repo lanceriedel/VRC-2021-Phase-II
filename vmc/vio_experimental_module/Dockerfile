@@ -40,6 +40,6 @@ RUN ls -l /etc/
 
 
 COPY . .
-COPY ./SN35321038.conf /usr/local/zed/settings/
+COPY ./*.conf /usr/local/zed/settings/
 RUN ls -l /usr/local/zed/settings/
 CMD ["python3", "vio-experimental.py"]
