@@ -41,6 +41,7 @@ class ZEDCamera(object):
             # Enable positional tracking with default parameters
             py_transform = sl.Transform()  # First create a Transform object for TrackingParameters object
             self.tracking_parameters = sl.PositionalTrackingParameters(_init_pos=py_transform)
+            self.tracking_parameters.set_floor_as_origin = True
             err = self.zed.enable_positional_tracking(self.tracking_parameters)
             if err != sl.ERROR_CODE.SUCCESS:
                 exit(1)
@@ -84,7 +85,7 @@ class ZEDCamera(object):
                 tx = self.zed_pose.get_translation(py_translation).get()[0]
                 ty = self.zed_pose.get_translation(py_translation).get()[1]
                 tz = self.zed_pose.get_translation(py_translation).get()[2]
-                logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
+                #logger.debug("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
                 #print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, self.zed_pose.timestamp.get_milliseconds()))
 
                 # Display the orientation quaternion
@@ -107,12 +108,16 @@ class ZEDCamera(object):
     #           logger.debug("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
                 
                 current_time = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_milliseconds()
-                diffx = abs(tx - self.last_pos[0])
-                diffy = abs(ty - self.last_pos[1])
-                diffz = abs(tz - self.last_pos[2])
+                diffx = (tx - self.last_pos[0])
+                diffy = (ty - self.last_pos[1])
+                diffz = (tz - self.last_pos[2])
                 time_diff =( current_time - self.last_time)/1000 
+                #logger.debug("velocity calc ->:timediff: {0}  x: {1}, y: {2}, z {3}\n".format(time_diff, diffx, diffy, diffz))
                 a_velocity = [diffx/time_diff, diffy/time_diff, diffz/time_diff]
                 self.last_time = current_time
+                self.last_pos[0] = tx
+                self.last_pos[1] = ty
+                self.last_pos[2] = tz
             
 
                 #vx = (a_velocity[0], 3)
@@ -132,7 +137,16 @@ class ZEDCamera(object):
 
             #assemble return value
                 #rotation =  {"w": ow, "x" : ox , "y" : oy, "z" : oz}
-                rotation = self.zed_pose.get_orientation(py_orientation).get()
+                orotation = self.zed_pose.get_orientation(py_orientation)
+                #logger.debug(f"Raw Rotation: {orotation}")
+                 #fix backwards y
+                o = sl.Orientation()
+                #self.zed_pose.get_orientation(o)
+                #logger.debug("rotation calc fix about to happen")
+                o.init_vector (orotation.get()[0],orotation.get()[1]*-1, orotation.get()[2],orotation.get()[3])
+                #logger.debug("about to fix rotate calc")
+                rotation =  o.get()
+                
                 translation =   {"x" : tx, "y" : ty, "z" : tz}
                 velocity = a_velocity
                 data = {"rotation" : rotation, "translation" : translation, "velocity" : velocity, "tracker_confidence":0x3,"mapper_confidence":0x3}
