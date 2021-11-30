@@ -25,18 +25,11 @@ RUN apt install -y \
     software-properties-common
 
 
-WORKDIR /
-
-
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
 RUN python3 -m pip install pip wheel --upgrade && \
     python3 -m pip install -r requirements.txt
-RUN ls -l /usr/local/
-RUN ls -l /usr/local/zed #redo3
-RUN ls -l /usr/local/zed/include
-RUN ls -l /etc/
 
 
 COPY . .
