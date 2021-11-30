@@ -142,13 +142,11 @@ class ZEDCameraCoordinateTransformation(object):
                 data['translation']['y'] * 100,
                 data['translation']['z'] * 100,
             ]  # cm
-           # logger.debug(f"retrieved translation")
-            #logger.debug(f"VIO:raw velocity: {data['velocity']}")
+ 
             velocity = np.transpose(
                 [data['velocity'][0] * 100, data['velocity'][1] * 100, data['velocity'][2] * 100, 0]
             )  # cm/s
             #logger.debug(f"VIO:transposed velocity: {velocity}")
-            #logger.debug("vio extracted velocity camera data")
             H_ZEDCAMRef_ZEDCAMBody = t3d.affines.compose(
                 position, t3d.quaternions.quat2mat(quaternion), [1, 1, 1]
             )
@@ -174,14 +172,11 @@ class ZEDCameraCoordinateTransformation(object):
 
             H_vel = self.tm["H_aeroRefSync_aeroRef"].dot(self.tm["H_aeroRef_ZEDCAMRef"])
 
-            #logger.debug ("About to transpose")
             vel = np.transpose(H_vel.dot(velocity))
             #logger.debug(f"VIO:final tansposed velocity: {data['velocity']}")
 
 
             #logger.debug ("Done.. returning transformed values")
-
-
             # print("ZEDCAM: N: {:.3f}\tE: {:.3f}\tD: {:.3f}\tR: {:.3f}\tP: {:.3f}\tY: {:.3f}\tVn: {:.3f}\tVe: {:.3f}\tVd: {:.3f}".format(
             #     translate[0], translate[1], translate[2], angles[0], angles[1], angles[2], vel[0], vel[1], vel[2]))
 
@@ -225,7 +220,6 @@ class VIO(object):
         self, ned_pos, ned_vel, rpy, tracker_confidence, mapper_confidence
     ):
         try:
-            #logger.debug(f"ZEDCamera publish updates - checking values")
             #logger.debug(f"ZEDCamera publish updates: {ned_pos}")
             if not np.isnan(ned_pos).any():
                 n = float(ned_pos[0])
@@ -310,7 +304,6 @@ class VIO(object):
                 ned_pos, ned_vel, rpy = self.coord_trans.transform_zedcamera_to_global_ned(
                     data
                 )
-                #logger.debug("Publishing updates")
                 #logger.debug(f"Publishing updates:{ned_pos},{ned_vel},{rpy}")
                 try:
                     self.publish_updates(
