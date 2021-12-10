@@ -37,6 +37,7 @@ class PCCModule(object):
             f"{self.topic_prefix}/set_servo_max": self.set_servo_max,
             f"{self.topic_prefix}/set_servo_pct": self.set_servo_pct,
             f"{self.topic_prefix}/set_pixel_cycle": self.set_pixel_cycle,
+            f"{self.topic_prefix}/set_trigger_switch": self.set_trigger_switch,
             f"{self.topic_prefix}/reset": self.reset,
         }
 
@@ -95,6 +96,11 @@ class PCCModule(object):
         target_pixel: int = payload["target_pixel"]
         delay_ms: int = payload["delay_ms"]
         self.pcc.set_pixel_cycle( target_pixel,delay_ms)
+
+    def set_trigger_switch(self, payload: dict) -> None:
+        which_switch: int = payload["which_switch"]
+        how_long: int = payload["how_long"]
+        self.pcc.set_pixel_cycle( which_switch,how_long)
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]
