@@ -100,7 +100,7 @@ class PCCModule(object):
     def set_trigger_switch(self, payload: dict) -> None:
         which_switch: int = payload["which_switch"]
         how_long: int = payload["how_long"]
-        self.pcc.set_pixel_cycle( which_switch,how_long)
+        self.pcc.set_trigger_switch( which_switch,how_long)
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]
