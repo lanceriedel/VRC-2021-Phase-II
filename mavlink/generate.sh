@@ -11,7 +11,7 @@ PX4_VERSION=v1.11.0
 startdir=$(pwd)
 
 echo "--- Cleaning old data"
-basedir="$(readlink -f "$(dirname "$0")")"
+basedir="$(greadlink -f "$(dirname "$0")")"
 cd "$basedir"
 
 sudo rm -rf build/
@@ -53,7 +53,7 @@ git commit -m "Local commit to facilitate build"
 
 echo "--- Copying MAVLink dialect"
 # need to match the dialect used by the FCC and pymavlink, otherwise we'll have a bad time
-python3 -m pip install -r "$basedir/../vmc/flight_control_module/requirements.txt"
+#python3 -m pip install -r "$basedir/../vmc/flight_control_module/requirements.txt"
 
 mkdir -p "$basedir/target"
 py=$(ls "$basedir/build/.tmpvenv/lib/")

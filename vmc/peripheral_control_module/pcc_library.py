@@ -25,8 +25,9 @@ class VRC_Peripheral(object):
             "SET_BASE_COLOR": 4,
             "SET_TEMP_COLOR": 5,
             "SET_PIXEL_CYCLE" : 6,
-            "RESET_VRC_PERIPH": 7,
-            "CHECK_SERVO_CONTROLLER": 8,
+            "SET_TRIGGER_SWITCH" : 7,
+            "RESET_VRC_PERIPH": 8,
+            "CHECK_SERVO_CONTROLLER": 9,
         }
 
         self.use_serial = use_serial
@@ -196,6 +197,22 @@ class VRC_Peripheral(object):
         data = []
 
         data = [waittime_ms, pixel]
+        valid_command = True
+
+        if valid_command:
+            if self.use_serial is True:
+                self.ser.write(self._construct_payload(command, length, data))
+            else:
+                logger.debug("VRC_Peripheral serial data: ")
+                logger.debug(data)
+
+    def set_trigger_switch(self,which_switch: int,howlong_ms: int) -> None:
+        
+        command = self.commands["SET_TRIGGER_SWITCH"]
+        length = 3  # command + SWITCH + HOWLONG
+        data = []
+
+        data = [howlong_ms, which_switch]
         valid_command = True
 
         if valid_command:
