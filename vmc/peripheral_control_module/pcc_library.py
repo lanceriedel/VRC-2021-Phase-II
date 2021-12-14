@@ -28,8 +28,8 @@ class VRC_Peripheral(object):
             "SET_TRIGGER_SWITCH" : 7,
             "SET_SWITCH_ON" : 8,
             "SET_SWITCH_OFF" : 9,
-            "RESET_VRC_PERIPH": 8,
-            "CHECK_SERVO_CONTROLLER": 9,
+            "RESET_VRC_PERIPH": 10,
+            "CHECK_SERVO_CONTROLLER": 11,
         }
 
         self.use_serial = use_serial
