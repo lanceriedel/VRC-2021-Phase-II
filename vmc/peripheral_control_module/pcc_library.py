@@ -226,7 +226,7 @@ class VRC_Peripheral(object):
                 
     def set_switch_on(self,which_switch: int) -> None:
         
-        command = self.commands["SET_TRIGGER_ON"]
+        command = self.commands["SET_SWITCH_ON"]
         length = 2  # command + SWITCH
         data = []
 
