@@ -38,6 +38,9 @@ class PCCModule(object):
             f"{self.topic_prefix}/set_servo_pct": self.set_servo_pct,
             f"{self.topic_prefix}/set_pixel_cycle": self.set_pixel_cycle,
             f"{self.topic_prefix}/set_trigger_switch": self.set_trigger_switch,
+            f"{self.topic_prefix}/set_switch_on": self.set_switch_on,
+            f"{self.topic_prefix}/set_switch_off": self.set_switch_off,
+
             f"{self.topic_prefix}/reset": self.reset,
         }
 
@@ -101,6 +104,14 @@ class PCCModule(object):
         which_switch: int = payload["which_switch"]
         how_long: int = payload["how_long"]
         self.pcc.set_trigger_switch( which_switch,how_long)
+
+    def set_switch_on(self, payload: dict) -> None:
+        which_switch: int = payload["which_switch"]
+        self.pcc.set_switch_on( which_switch)
+
+    def set_switch_off(self, payload: dict) -> None:
+        which_switch: int = payload["which_switch"]
+        self.pcc.set_switch_off( which_switch)
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]

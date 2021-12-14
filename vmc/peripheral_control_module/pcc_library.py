@@ -26,6 +26,8 @@ class VRC_Peripheral(object):
             "SET_TEMP_COLOR": 5,
             "SET_PIXEL_CYCLE" : 6,
             "SET_TRIGGER_SWITCH" : 7,
+            "SET_SWITCH_ON" : 8,
+            "SET_SWITCH_OFF" : 9,
             "RESET_VRC_PERIPH": 8,
             "CHECK_SERVO_CONTROLLER": 9,
         }
@@ -221,6 +223,39 @@ class VRC_Peripheral(object):
             else:
                 logger.debug("VRC_Peripheral serial data: ")
                 logger.debug(data)
+                
+    def set_switch_on(self,which_switch: int) -> None:
+        
+        command = self.commands["SET_TRIGGER_ON"]
+        length = 2  # command + SWITCH
+        data = []
+
+        data = [which_switch]
+        valid_command = True
+
+        if valid_command:
+            if self.use_serial is True:
+                self.ser.write(self._construct_payload(command, length, data))
+            else:
+                logger.debug("VRC_Peripheral serial data: ")
+                logger.debug(data)
+
+    def set_switch_off(self,which_switch: int) -> None:
+        
+        command = self.commands["SET_SWITCH_OFF"]
+        length = 2  # command + SWITCH
+        data = []
+
+        data = [which_switch]
+        valid_command = True
+
+        if valid_command:
+            if self.use_serial is True:
+                self.ser.write(self._construct_payload(command, length, data))
+            else:
+                logger.debug("VRC_Peripheral serial data: ")
+                logger.debug(data)
+
 
 
     def _construct_payload(self, code: int, size: int = 0, data: list = []):
