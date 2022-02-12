@@ -1,6 +1,5 @@
-FROM stereolabs/zed:3.6-py-devel-jetson-jp4.6
-#FROM stereolabs/zed:3.6-tools-devel-jetson-jp4.6
-#3.6-py-devel-jetson-jp4.6
+#FROM stereolabs/zed:3.6-py-devel-jetson-jp4.6
+FROM stereolabs/zed:3.6-tools-devel-jetson-jp4.6
 
 ENV DEBIAN_FRONTEND=noninteractive
 # https://stackoverflow.com/a/66057286
@@ -23,8 +22,7 @@ RUN apt install -y \
     libglfw3-dev \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
-    software-properties-common \
-    vim
+    software-properties-common
 
 
 WORKDIR /app
@@ -37,4 +35,3 @@ RUN python3 -m pip install pip wheel --upgrade && \
 COPY . .
 COPY ./*.conf /usr/local/zed/settings/
 RUN ls -l /usr/local/zed/settings/
-CMD ["python3", "vio-experimental.py"]
