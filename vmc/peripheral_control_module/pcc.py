@@ -48,6 +48,7 @@ class PCCModule(object):
     def run(self):
         self.mqtt_client.connect(host=self.mqtt_host, port=self.mqtt_port, keepalive=60)
         self.mqtt_client.loop_forever()
+        self.pcc.run()
 
     def on_message(
         self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage
@@ -58,6 +59,7 @@ class PCCModule(object):
             if msg.topic in self.topic_map:
                 payload = json.loads(msg.payload)
                 self.topic_map[msg.topic](payload)
+            self.pcc.incoming()
         except Exception as e:
             logger.exception(f"Error handling message on {msg.topic}")
 

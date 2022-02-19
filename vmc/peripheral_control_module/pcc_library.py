@@ -37,10 +37,11 @@ class VRC_Peripheral(object):
         self.use_serial = use_serial
 
         if self.use_serial:
-            logger.debug("Opening serial port")
+            logger.debug("Opening serial port::::")
             self.ser = serial.Serial()
             self.ser.baudrate = 115200
             self.ser.port = self.port
+            self.ser.timeout = 5
             self.ser.open()
 
         else:
@@ -49,14 +50,27 @@ class VRC_Peripheral(object):
         self.shutdown: bool = False
 
     def run(self) -> None:
+        logger.debug("Initiating RUN>>")
+
         while not self.shutdown:
             if self.use_serial:
                 while self.ser.in_waiting > 0:
-                    print(self.ser.read(1), end="")
+                    logger.debug("data to be read...")
+                    readdata = self.ser.read(1)
+                    print(readdata, end="")
+                    logger.debug(readdata)
                 if (self.ser.in_waiting==0):
-                    print("not bytes")
-
+                    logger.debug("not bytes")
             time.sleep(0.01)
+
+    def incoming(self) -> None:
+        logger.debug("checking for incoming")
+        while self.ser.in_waiting > 0:
+            readdata = self.ser.read(1)
+            print(readdata, end="")
+            logger.debug(readdata)
+        if (self.ser.in_waiting==0):
+            logger.debug("not bytes")
 
     def set_base_color(self, wrgb: List[int]) -> None:
         # wrgb + code = 5
