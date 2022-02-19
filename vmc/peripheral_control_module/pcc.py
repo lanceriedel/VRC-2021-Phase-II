@@ -115,7 +115,6 @@ class PCCModule(object):
     def set_switch_off(self, payload: dict) -> None:
         which_switch: int = payload["which_switch"]
         self.pcc.set_switch_off( which_switch)
-   
     def set_laser_on(self, payload) -> None:
         logger.info(f"About to laser on")
         self.pcc.set_laser_on( )
