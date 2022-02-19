@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  mavp2p:
+    image: ghcr.io/bellflight/vrc_mavp2p:latest
+    command: serial:/dev/ttyTHS1:500000 tcps:0.0.0.0:5760 udpc:127.0.0.1:14541 udpc:127.0.0.1:14542 --print-errors
+    restart: unless-stopped
+    devices:
+      - "/dev/ttyTHS1:/dev/ttyTHS1"
+    network_mode: "host"
+
+  mqtt:
+    image: docker.io/library/eclipse-mosquitto:2.0.11
+    ports:
+      - "18830:18830"
+    restart: on-failure
+    volumes:
+      - ./vmc/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  fcc:
+    depends_on:
+      - mqtt
+      - mavp2p
+    image: ghcr.io/bellflight/vrc_flight_control_module:latest
+    network_mode: "host"
+    restart: on-failure
+
+  vio:
+    depends_on:
+      - mqtt
+    image: vio-experimental:v1
+    privileged: true
+    restart: on-failure
+
+  fusion:
+    depends_on:
+      - mqtt
+      - vio
+      - apriltag
+    image: ghcr.io/bellflight/vrc_fusion_module:latest
+    restart: on-failure
+
+  sandbox:
+     depends_on:
+       - mqtt
+     build: vrc_sandbox
+     restart: on-failure
