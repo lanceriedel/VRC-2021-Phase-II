@@ -28,8 +28,10 @@ class VRC_Peripheral(object):
             "SET_TRIGGER_SWITCH" : 7,
             "SET_SWITCH_ON" : 8,
             "SET_SWITCH_OFF" : 9,
-            "RESET_VRC_PERIPH": 10,
-            "CHECK_SERVO_CONTROLLER": 11,
+            "SET_LASER_ON" : 10,
+            "SET_LASER_OFF" : 11,
+            "RESET_VRC_PERIPH": 12,
+            "CHECK_SERVO_CONTROLLER": 13,
         }
 
         self.use_serial = use_serial
@@ -189,6 +191,18 @@ class VRC_Peripheral(object):
     def check_servo_controller(self) -> None:
         if self.use_serial:
             command = self.commands["CHECK_SERVO_CONTROLLER"]
+            length = 1
+            self.ser.write(self._construct_payload(command, length))
+
+    def set_laser_on(self) -> None:
+        if self.use_serial:
+            command = self.commands["SET_LASER_ON"]
+            length = 1
+            self.ser.write(self._construct_payload(command, length))
+
+    def set_laser_off(self) -> None:
+        if self.use_serial:
+            command = self.commands["SET_LASER_OFF"]
             length = 1
             self.ser.write(self._construct_payload(command, length))
 

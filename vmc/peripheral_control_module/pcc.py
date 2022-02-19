@@ -39,8 +39,9 @@ class PCCModule(object):
             f"{self.topic_prefix}/set_pixel_cycle": self.set_pixel_cycle,
             f"{self.topic_prefix}/set_trigger_switch": self.set_trigger_switch,
             f"{self.topic_prefix}/set_switch_on": self.set_switch_on,
-            f"{self.topic_prefix}/set_switch_off": self.set_switch_off,
-
+            f"{self.topic_prefix}/set_switch_on": self.set_switch_off,
+            f"{self.topic_prefix}/set_laser_on": self.set_laser_on,
+            f"{self.topic_prefix}/set_laser_off": self.set_laser_off,
             f"{self.topic_prefix}/reset": self.reset,
         }
 
@@ -109,9 +110,19 @@ class PCCModule(object):
         which_switch: int = payload["which_switch"]
         self.pcc.set_switch_on( which_switch)
 
+    
+
     def set_switch_off(self, payload: dict) -> None:
         which_switch: int = payload["which_switch"]
         self.pcc.set_switch_off( which_switch)
+    
+    def set_laser_on(self, payload) -> None:
+        logger.info(f"About to laser on")
+        self.pcc.set_laser_on( )
+
+    def set_laser_off(self, payload) -> None:
+        logger.info(f"About to laser off")
+        self.pcc.set_laser_off( )
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]
