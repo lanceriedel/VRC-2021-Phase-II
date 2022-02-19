@@ -14,8 +14,8 @@ class VRC_Peripheral(object):
 
         self.PREAMBLE = (0x24, 0x50)
 
-        self.HEADER_OUTGOING = (*self.PREAMBLE, 0x3C)
-        self.HEADER_INCOMING = (*self.PREAMBLE, 0x3E)
+        self.HEADER_OUTGOING = (*self.PREAMBLE, 0x3C) #<
+        self.HEADER_INCOMING = (*self.PREAMBLE, 0x3E) #>
 
         self.commands = {
             "SET_SERVO_OPEN_CLOSE": 0,
