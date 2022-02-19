@@ -53,6 +53,8 @@ class VRC_Peripheral(object):
             if self.use_serial:
                 while self.ser.in_waiting > 0:
                     print(self.ser.read(1), end="")
+                if (self.ser.in_waiting==0):
+                    print("not bytes")
 
             time.sleep(0.01)
 
