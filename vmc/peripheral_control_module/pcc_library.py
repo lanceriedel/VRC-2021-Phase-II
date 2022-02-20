@@ -61,9 +61,12 @@ class VRC_Peripheral(object):
             readdata = self.ser.read(2047)
             if (readdata[1]!=0x50): 
                 logger.debug("Not correct start of instructions")
+                logger.debug(readdata[1])
+
                 return
             if (readdata[2]!=0x3E):
                 logger.debug("Not correct direction")
+                logger.debug(readdata[2])
                 return
             code = readdata[3]
             if (code==self.commands["SEND_THERMAL_READING"]):
