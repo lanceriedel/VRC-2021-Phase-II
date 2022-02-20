@@ -49,6 +49,12 @@ class VRC_Peripheral(object):
 
         self.shutdown: bool = False
 
+    def parsein() -> None:
+        while self.ser.in_waiting > 0:
+            logger.debug("data to be read...")
+            readdata = self.ser.read(2047)
+            logger.debug(readdata)
+
     def run(self) -> None:
         logger.debug("Initiating RUN>>")
 
@@ -57,7 +63,10 @@ class VRC_Peripheral(object):
                 while self.ser.in_waiting > 0:
                     logger.debug("data to be read...")
                     readdata = self.ser.read(1)
-                    print(readdata, end="")
+                    if (readdata=='$'):
+                        parsein()
+                    else:
+                        print(readdata, end="")
                     logger.debug(readdata)
                 if (self.ser.in_waiting==0):
                     logger.debug("not bytes")
