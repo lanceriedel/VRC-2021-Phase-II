@@ -60,8 +60,10 @@ class VRC_Peripheral(object):
             logger.debug("data to be read parsein...")
             readdata = self.ser.read(2047)
             if (readdata[1]!=0x50): 
+                logger.debug("Not correct start of instructions")
                 return
-            if (readdata[2]!=0x33):
+            if (readdata[2]!=0x3E):
+                logger.debug("Not correct direction")
                 return
             code = readdata[3]
             if (code==self.commands["SEND_THERMAL_READING"]):
@@ -70,8 +72,11 @@ class VRC_Peripheral(object):
                 logger.debug("datasize:")
                 logger.debug(numrecs)
                 data_val = readdata[6:numrecs]
-                logger.debug(data_val)
+                logger.debug(data_val) 
                 return data_val
+            else:
+                logger.debug("not correct code")
+                logger.debug(code)
 
     def run(self) -> None:
         logger.debug("Initiating RUN>>")
