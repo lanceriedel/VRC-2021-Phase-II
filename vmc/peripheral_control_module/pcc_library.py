@@ -1,5 +1,6 @@
 # VRC Peripheral Python Library
 # Written by Casey Hanner
+from pickletools import int4
 import time
 from struct import pack
 from typing import Any, List, Literal, Union
@@ -51,11 +52,26 @@ class VRC_Peripheral(object):
 
         self.shutdown: bool = False
 
-    def parsein(self) -> None:
+
+        # [$][P][>][LENGTH-HI][LENGTH-LOW][DATA][CRC]
+
+    def parsein(self) -> List[int]:
         while self.ser.in_waiting > 0:
             logger.debug("data to be read parsein...")
             readdata = self.ser.read(2047)
-            logger.debug(readdata)
+            if (readdata[1]!=0x50): 
+                return
+            if (readdata[2]!=0x33):
+                return
+            code = readdata[3]
+            if (code==self.commands["SEND_THERMAL_READING"]):
+                byte_val = [readdata[4],readdata[5]]
+                numrecs = int.from_bytes(byte_val, "big")
+                logger.debug("datasize:")
+                logger.debug(numrecs)
+                data_val = readdata[6:numrecs]
+                logger.debug(data_val)
+                return data_val
 
     def run(self) -> None:
         logger.debug("Initiating RUN>>")
@@ -63,24 +79,18 @@ class VRC_Peripheral(object):
         while not self.shutdown:
             if self.use_serial:
                 while self.ser.in_waiting > 0:
-                    logger.debug("data to be read...")
-                    readdata = self.ser.read(1)
-                    if (readdata=='$'):
-                        self.parsein()
-                    else:
-                        print(readdata, end="")
-                    logger.debug(readdata)
+                  logger.debug("bytes")
                 if (self.ser.in_waiting==0):
                     logger.debug("not bytes")
             time.sleep(0.01)
 
-    def incoming(self) -> None:
+    def incoming(self) -> List[int]:
         logger.debug("checking for incoming")
         while self.ser.in_waiting > 0:
             logger.debug("data to be read...")
             readdata = self.ser.read(1)
             if (readdata[0]==0x24):
-                self.parsein()
+                return self.parsein()
             #else:
                 #print(readdata, end="")
                 #logger.debug(readdata)
