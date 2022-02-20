@@ -42,6 +42,7 @@ class PCCModule(object):
             f"{self.topic_prefix}/set_switch_on": self.set_switch_off,
             f"{self.topic_prefix}/set_laser_on": self.set_laser_on,
             f"{self.topic_prefix}/set_laser_off": self.set_laser_off,
+            f"{self.topic_prefix}/request_thermal_reading": self.request_thermal_reading,
             f"{self.topic_prefix}/reset": self.reset,
         }
 
@@ -124,6 +125,10 @@ class PCCModule(object):
     def set_laser_off(self, payload) -> None:
         logger.info(f"About to laser off")
         self.pcc.set_laser_off( )
+
+    def request_thermal_reading(self, payload) -> None:
+        logger.info(f"Request Thermal Reading")
+        self.pcc.request_termal_reading()
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]
