@@ -77,8 +77,7 @@ class VRC_Peripheral(object):
         while self.ser.in_waiting > 0:
             logger.debug("data to be read...")
             readdata = self.ser.read(1)
-            ba = bytearray([int(readdata, 16)])
-            if (ba=='$'):
+            if (readdata==0x24):
                 self.parsein()
             else:
                 print(readdata, end="")
