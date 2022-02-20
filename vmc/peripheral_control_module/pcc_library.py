@@ -51,7 +51,7 @@ class VRC_Peripheral(object):
 
     def parsein(self) -> None:
         while self.ser.in_waiting > 0:
-            logger.debug("data to be read...")
+            logger.debug("data to be read parsein...")
             readdata = self.ser.read(2047)
             logger.debug(readdata)
 
@@ -79,9 +79,9 @@ class VRC_Peripheral(object):
             readdata = self.ser.read(1)
             if (readdata==0x24):
                 self.parsein()
-            else:
-                print(readdata, end="")
-                logger.debug(readdata)
+            #else:
+                #print(readdata, end="")
+                #logger.debug(readdata)
             if (self.ser.in_waiting==0):
                 logger.debug("not bytes")
             time.sleep(0.01)
