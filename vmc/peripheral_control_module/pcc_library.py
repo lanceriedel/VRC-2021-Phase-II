@@ -75,11 +75,16 @@ class VRC_Peripheral(object):
     def incoming(self) -> None:
         logger.debug("checking for incoming")
         while self.ser.in_waiting > 0:
+            logger.debug("data to be read...")
             readdata = self.ser.read(1)
-            print(readdata, end="")
-            logger.debug(readdata)
-        if (self.ser.in_waiting==0):
-            logger.debug("not bytes")
+            if (readdata=='$'):
+                self.parsein()
+            else:
+                print(readdata, end="")
+                logger.debug(readdata)
+            if (self.ser.in_waiting==0):
+                logger.debug("not bytes")
+            time.sleep(0.01)
 
     def set_base_color(self, wrgb: List[int]) -> None:
         # wrgb + code = 5
