@@ -49,7 +49,7 @@ class VRC_Peripheral(object):
 
         self.shutdown: bool = False
 
-    def parsein() -> None:
+    def parsein(self) -> None:
         while self.ser.in_waiting > 0:
             logger.debug("data to be read...")
             readdata = self.ser.read(2047)
@@ -64,7 +64,7 @@ class VRC_Peripheral(object):
                     logger.debug("data to be read...")
                     readdata = self.ser.read(1)
                     if (readdata=='$'):
-                        parsein()
+                        self.parsein()
                     else:
                         print(readdata, end="")
                     logger.debug(readdata)

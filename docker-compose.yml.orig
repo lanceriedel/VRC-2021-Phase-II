@@ -36,7 +36,7 @@ services:
   vio:
     depends_on:
       - mqtt
-    image: vio-experimental:v1
+    image: ghcr.io/bellflight/vrc_vio_module:latest
     privileged: true
     restart: on-failure
 
