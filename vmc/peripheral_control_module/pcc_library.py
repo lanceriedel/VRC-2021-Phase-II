@@ -238,6 +238,9 @@ class VRC_Peripheral(object):
             length = 1
             self.ser.write(self._construct_payload(command, length))
 
+        time.sleep(.1)
+        self.incoming()
+
     def set_laser_off(self) -> None:
         if self.use_serial:
             command = self.commands["SET_LASER_OFF"]
