@@ -59,18 +59,18 @@ class VRC_Peripheral(object):
         while self.ser.in_waiting > 0:
             logger.debug("data to be read parsein...")
             readdata = self.ser.read(2047)
-            if (readdata[1]!=0x50): 
+            if (readdata[0]!=0x50): 
                 logger.debug("Not correct start of instructions")
                 logger.debug(readdata[1])
 
                 return
-            if (readdata[2]!=0x3E):
+            if (readdata[1]!=0x3E):
                 logger.debug("Not correct direction")
                 logger.debug(readdata[2])
                 return
-            code = readdata[3]
+            code = readdata[2]
             if (code==self.commands["SEND_THERMAL_READING"]):
-                byte_val = [readdata[4],readdata[5]]
+                byte_val = [readdata[3],readdata[4]]
                 numrecs = int.from_bytes(byte_val, "big")
                 logger.debug("datasize:")
                 logger.debug(numrecs)
