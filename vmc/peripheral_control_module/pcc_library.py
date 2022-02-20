@@ -70,7 +70,7 @@ class VRC_Peripheral(object):
                 return
             code = readdata[2]
             if (code==self.commands["SEND_THERMAL_READING"]):
-                byte_val = [readdata[3],readdata[4]]
+                byte_val = [readdata[4],readdata[3]]
                 numrecs = int.from_bytes(byte_val, "big")
                 logger.debug("datasize:")
                 logger.debug(numrecs)
