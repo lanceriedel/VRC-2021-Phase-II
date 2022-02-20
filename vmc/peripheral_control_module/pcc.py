@@ -132,9 +132,10 @@ class PCCModule(object):
         self.pcc.request_thermal_reading()
         time.sleep(0.1)
         data = self.pcc.incoming()
-        #base64EncodedStr = base64.b64encode(data.encode('utf-8'))
+        values = bytearray(data)
+        base64EncodedStr = base64.b64encode(values.encode('utf-8'))
 
-        thermalreading = { "reading":  data}
+        thermalreading = { "reading":  base64EncodedStr}
         self.mqtt_client.publish(
                 f"{self.topic_prefix}/thermal_reading",
                 json.dumps(thermalreading),
