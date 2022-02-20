@@ -1,4 +1,5 @@
 import json
+import time
 from typing import Any, List
 
 from loguru import logger
@@ -60,7 +61,6 @@ class PCCModule(object):
             if msg.topic in self.topic_map:
                 payload = json.loads(msg.payload)
                 self.topic_map[msg.topic](payload)
-            self.pcc.incoming()
         except Exception as e:
             logger.exception(f"Error handling message on {msg.topic}")
 
@@ -128,7 +128,11 @@ class PCCModule(object):
 
     def request_thermal_reading(self, payload) -> None:
         logger.info(f"Request Thermal Reading")
-        self.pcc.request_termal_reading()
+        self.pcc.request_thermal_reading()
+        time.sleep(0.1)
+        self.pcc.incoming()
+        
+
 
     def set_servo_pct(self, payload: dict) -> None:
         servo: int = payload["servo"]
