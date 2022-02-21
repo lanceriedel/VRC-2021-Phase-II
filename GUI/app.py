@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+import base64
 import os
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
 import paho.mqtt.client as mqtt
 from PySide6 import QtCore, QtGui, QtWidgets
+
+try:
+    from thermalview import VRC_ThermalView # type: ignore
+except ImportError:
+    from .thermalview import VRC_ThermalView
+
 
 if getattr(sys, "frozen", False):
     IMG_DIR = os.path.join(sys._MEIPASS, "img")  # type: ignore
@@ -63,7 +70,13 @@ class MQTTClient(QtCore.QObject):
         """
         Callback for every MQTT message
         """
-        self.message.emit(msg.topic, msg.payload.decode("utf-8"))
+        if msg.topic=="vrc/pcc/thermal_readingf":
+            self.message.emit(msg.topic, msg.payload)
+            print("emitting message")
+            print(msg.payload)
+        else:
+            self.message.emit(msg.topic, msg.payload.decode("utf-8"))
+
 
     def on_disconnect(
         self,
@@ -116,6 +129,10 @@ class MainWidget(QtWidgets.QWidget):
         self.mqtt_view_widget = MQTTViewWidget(self)
         self.mqtt_view_widget.build()
         self.mqtt_view_widget.show()
+
+        self.thermal_view_widget = ThermalViewWidget(self)
+        # self.thermal_view_widget.build()
+        # self.thermal_view_widget.show()
 
         self.connect_mqtt()
 
@@ -170,6 +187,7 @@ class MainWidget(QtWidgets.QWidget):
 
         # connect message signals
         self.mqtt_client.message.connect(self.mqtt_view_widget.process_message)
+        self.mqtt_client.message.connect(self.thermal_view_widget.process_message)
         self.mqtt_client.message.connect(self.control_widget.process_message)
 
 
@@ -386,6 +404,12 @@ class ControlWidget(QtWidgets.QWidget):
 
         layout.addWidget(status_groupbox, 4, 0, 1, 4)
 
+         # ==========================
+        # Thermal Heatmap
+        thermal_groupbox = QtWidgets.QGroupBox("Thermal Map")
+        thermal_layout = QtWidgets.QHBoxLayout()
+        thermal_groupbox.setLayout(thermal_layout)
+
     def publish_message(self, topic: str, payload: dict) -> None:
         """
         Publish a message to a topic
@@ -497,6 +521,71 @@ class ExpandCollapseQTreeWidget(QtWidgets.QTreeWidget):
             child.setExpanded(expand)
             self.expand_children(child, expand)
 
+
+class ThermalViewWidget():
+    # This widget is an effective clone of MQTT Explorer for diagnostic purposes.
+    # Displays the latest MQTT message for every topic in a tree view.
+
+    def __init__(self, parent: MainWidget) -> None:
+        self.thermalview = VRC_ThermalView()
+        # self.parent_ = parent
+        # super().__init__()
+
+        # self.setWindowTitle("Thermal Camera")
+        # set_icon(self)
+
+        # # secondary data store to maintain dict of topics and the last message recieved
+        # self.topic_payloads: Dict[str, Any] = {}
+
+        # # data structure to hold timers to blink item
+        # self.topic_timer: Dict[str, QtCore.QTimer] = {}
+
+        # # maintain the topic currently displayed in the data view.
+        # self.connected_topic: Optional[str] = None
+
+    # def build(self) -> None:
+    #     """
+    #     Build the layout
+    #     """
+    #     layout = QtWidgets.QHBoxLayout()
+    #     self.setLayout(layout)
+
+        
+
+    #     self.data_view = QtWidgets.QTextEdit()
+    #     self.data_view.setReadOnly(False)
+    #     self.data_view.setStyleSheet("background-color: rgb(220, 220, 220)")
+    #     layout.addWidget(self.data_view)
+
+    
+    def map_value(self,x, in_min, in_max, out_min, out_max):
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+    def process_message(self, topic: str, payload: str) -> None:
+        """
+        Process a new message on a topic.
+        """
+        if topic=="vrc/pcc/thermal_reading":
+            print("Selected topic")
+            print(payload)
+            payload_json = json.loads(payload)
+            print(payload_json)
+            datapayload = payload_json['reading']
+            base64Decoded = datapayload.encode('utf-8')
+            asbytes = base64.b64decode(base64Decoded)
+            b = bytearray(asbytes)
+            int_values = [x for x in b]
+            
+            pixels = [self.map_value(p, 0, 255, 26.0, 32.0) for p in int_values]
+            pixels = pixels[0:64]
+            print(pixels)
+
+            self.thermalview.update(pixels)
+            #unicode_text = str(asbytes, 'utf-8')
+            #bytearray(asbytes)
+
+
+    
 
 class MQTTViewWidget(QtWidgets.QWidget):
     # This widget is an effective clone of MQTT Explorer for diagnostic purposes.
