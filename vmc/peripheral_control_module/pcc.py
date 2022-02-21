@@ -129,11 +129,18 @@ class PCCModule(object):
 
     def request_thermal_reading(self, payload) -> None:
         logger.info(f"Request Thermal Reading")
+        logger.debug(str(payload))
         self.pcc.request_thermal_reading()
         time.sleep(0.1)
         data = self.pcc.incoming()
         values = bytearray(data)
+        int_values = [x for x in values]
+        logger.debug(str(int_values))
+        logger.debug(len(int_values))
+        logger.debug(str(values))
+        logger.debug(len(values))
         base64Encoded = base64.b64encode(values)
+        logger.debug(str(base64Encoded))
         base64_string = base64Encoded.decode('utf-8')
 
         thermalreading = { "reading":  base64_string}
