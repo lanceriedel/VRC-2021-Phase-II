@@ -575,6 +575,8 @@ class ThermalViewWidget():
             asbytes = base64.b64decode(base64Decoded)
             b = bytearray(asbytes)
             int_values = [x for x in b]
+            print (int_values)
+            print(len(int_values))
             
             pixels = [self.map_value(p, 0, 255, 26.0, 32.0) for p in int_values]
             pixels = pixels[0:64]

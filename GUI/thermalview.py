@@ -67,9 +67,15 @@ class VRC_ThermalView(object):
         #pixels = []
         #for row in self.sensor.pixels:
         #    pixels = pixels + row
+        print(len(pixels))
+
         pixels = [self.map_value(p, self.MINTEMP, self.MAXTEMP, 0, self.COLORDEPTH - 1) for p in pixels]
 
         # perform interpolation
+        print(len(pixels))
+        print(len(self.points))
+
+
         bicubic = griddata(self.points, pixels, (self.grid_x, self.grid_y), method="cubic")
 
         # draw everything
