@@ -130,9 +130,10 @@ class MainWidget(QtWidgets.QWidget):
         self.mqtt_view_widget.build()
         self.mqtt_view_widget.show()
 
-        self.thermal_view_widget = ThermalViewWidget(self)
-        # self.thermal_view_widget.build()
-        # self.thermal_view_widget.show()
+        self.thermal_view_widget = ThermalViewWidget(self, self.mqtt_client)
+        
+        
+        
 
         self.connect_mqtt()
 
@@ -409,6 +410,10 @@ class ControlWidget(QtWidgets.QWidget):
         thermal_groupbox = QtWidgets.QGroupBox("Thermal Map")
         thermal_layout = QtWidgets.QHBoxLayout()
         thermal_groupbox.setLayout(thermal_layout)
+        
+
+    def thermalupdate(self):
+        print("updated thermal")
 
     def publish_message(self, topic: str, payload: dict) -> None:
         """
@@ -523,40 +528,27 @@ class ExpandCollapseQTreeWidget(QtWidgets.QTreeWidget):
 
 
 class ThermalViewWidget():
-    # This widget is an effective clone of MQTT Explorer for diagnostic purposes.
-    # Displays the latest MQTT message for every topic in a tree view.
+    # This is a window to show the thermal camera view
 
-    def __init__(self, parent: MainWidget) -> None:
+    def __init__(self, parent: MainWidget, mqttClient) -> None:
         self.thermalview = VRC_ThermalView()
-        # self.parent_ = parent
-        # super().__init__()
-
-        # self.setWindowTitle("Thermal Camera")
-        # set_icon(self)
-
-        # # secondary data store to maintain dict of topics and the last message recieved
-        # self.topic_payloads: Dict[str, Any] = {}
-
-        # # data structure to hold timers to blink item
-        # self.topic_timer: Dict[str, QtCore.QTimer] = {}
-
-        # # maintain the topic currently displayed in the data view.
-        # self.connected_topic: Optional[str] = None
-
-    # def build(self) -> None:
-    #     """
-    #     Build the layout
-    #     """
-    #     layout = QtWidgets.QHBoxLayout()
-    #     self.setLayout(layout)
-
+        #set up a continuing request for an update to the thermal reading
+        self.timerupdatethermal = QtCore.QTimer()
+        self.timerupdatethermal.timeout.connect(lambda: self.update_thermal())  # type: ignore
+        self.timerupdatethermal.setSingleShot(False)
+        self.timerupdatethermal.setInterval(250)
+        self.timerupdatethermal.start(100)
+        self.mqtt_client = mqttClient
         
-
-    #     self.data_view = QtWidgets.QTextEdit()
-    #     self.data_view.setReadOnly(False)
-    #     self.data_view.setStyleSheet("background-color: rgb(220, 220, 220)")
-    #     layout.addWidget(self.data_view)
-
+    #Request to updated the thermal image -- 
+    # a vrc/pcc/therml_reading message should be sent back soon
+    def update_thermal(self):
+        self.mqtt_client.publish(
+                "vrc/pcc/request_thermal_reading",
+                "{}",
+                retain=False,
+                qos=0,
+            )
     
     def map_value(self,x, in_min, in_max, out_min, out_max):
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
@@ -566,28 +558,21 @@ class ThermalViewWidget():
         Process a new message on a topic.
         """
         if topic=="vrc/pcc/thermal_reading":
-            print("Selected topic")
-            print(payload)
             payload_json = json.loads(payload)
-            print(payload_json)
             datapayload = payload_json['reading']
+
+            #A lot of decoding -- maybe too many steps??
             base64Decoded = datapayload.encode('utf-8')
             asbytes = base64.b64decode(base64Decoded)
             b = bytearray(asbytes)
             int_values = [x for x in b]
-            print (int_values)
-            print(len(int_values))
-            
+            #back on scale
             pixels = [self.map_value(p, 0, 255, 26.0, 32.0) for p in int_values]
             pixels = pixels[0:64]
-            print(pixels)
-
+            #update the image
             self.thermalview.update(pixels)
-            #unicode_text = str(asbytes, 'utf-8')
-            #bytearray(asbytes)
 
 
-    
 
 class MQTTViewWidget(QtWidgets.QWidget):
     # This widget is an effective clone of MQTT Explorer for diagnostic purposes.

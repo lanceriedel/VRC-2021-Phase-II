@@ -31,8 +31,8 @@ class VRC_ThermalView(object):
         # pylint: enable=invalid-slice-index
 
         # sensor is an 8x8 grid so lets do a square
-        self.height = 1024
-        self.width = 1024
+        self.height = 512
+        self.width = 512
 
         # the list of colors we can choose from
         self.blue = colour.Color("indigo")
