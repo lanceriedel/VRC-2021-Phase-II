@@ -31,8 +31,8 @@ class VRC_ThermalView(object):
         # pylint: enable=invalid-slice-index
 
         # sensor is an 8x8 grid so lets do a square
-        self.height = 1024
-        self.width = 1024
+        self.height = 512
+        self.width = 512
 
         # the list of colors we can choose from
         self.blue = colour.Color("indigo")
@@ -67,9 +67,9 @@ class VRC_ThermalView(object):
         #pixels = []
         #for row in self.sensor.pixels:
         #    pixels = pixels + row
+
         pixels = [self.map_value(p, self.MINTEMP, self.MAXTEMP, 0, self.COLORDEPTH - 1) for p in pixels]
 
-        # perform interpolation
         bicubic = griddata(self.points, pixels, (self.grid_x, self.grid_y), method="cubic")
 
         # draw everything
