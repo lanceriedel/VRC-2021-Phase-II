@@ -74,7 +74,7 @@ class VRC_Peripheral(object):
                 numrecs = int.from_bytes(byte_val, "big")
                 logger.debug("datasize:")
                 logger.debug(numrecs)
-                offset = numrecs+6
+                offset = numrecs+5
                 data_val = readdata[5:offset]
                 logger.debug(data_val) 
                 return data_val
