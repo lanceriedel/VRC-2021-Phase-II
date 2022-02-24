@@ -133,6 +133,12 @@ class PCCModule(object):
         self.pcc.request_thermal_reading()
         time.sleep(0.1)
         data = self.pcc.incoming()
+        if (data == None): 
+            logger.info(f"Request Thermal Reading retuned None")
+            return
+        if (len(data) == 0):
+            logger.info(f"Request Thermal Reading retuned 0 len")
+            return
         values = bytearray(data)
         int_values = [x for x in values]
         logger.debug(str(int_values))

@@ -705,10 +705,10 @@ class ThermalViewWidget():
             b = bytearray(asbytes)
             int_values = [x for x in b]
             #back on scale
-            pixels = [self.map_value(p, 0, 255, 26.0, 32.0) for p in int_values]
-            pixels = pixels[0:64]
+           # pixels = [self.map_value(p, 0, 255, 15.0, 40.0) for p in int_values]
+           # pixels = pixels[0:64]
             #update the image
-            self.thermalview.update(pixels)
+            self.thermalview.update(int_values)
 
 
 

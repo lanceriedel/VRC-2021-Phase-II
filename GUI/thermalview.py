@@ -13,7 +13,7 @@ import colour
 class VRC_ThermalView(object):
     def __init__(self) -> None:
         # low range of the sensor (this will be blue on the screen)
-        self.MINTEMP = 26.0
+        self.MINTEMP = 20.0
 
         # high range of the sensor (this will be red on the screen)
         self.MAXTEMP = 32.0
