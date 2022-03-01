@@ -235,8 +235,8 @@ class MainWidget(QtWidgets.QWidget):
         self.thermal_view_widget = ThermalViewWidget(self, self.mqtt_client)
         self.connect_mqtt()
         
-        self.t1 = threading.Thread(target=self.thermal_view_widget.update_thermal)  
-        self.t1.start()
+        #self.t1 = threading.Thread(target=self.thermal_view_widget.update_thermal)  
+        #self.t1.start()
  
  
     def connect_mqtt(self) -> None:
@@ -678,9 +678,8 @@ class ThermalViewWidget():
     # a vrc/pcc/therml_reading message should be sent back soon
     def update_thermal(self):
         while (True) : 
-            print("Update thermal...")
             self.mqtt_client.publish(
-                    "vrc/pcc/request_thermal_reading",
+                    "vrc/thermal/request_thermal_reading",
                     "{}",
                     retain=False,
                     qos=0,
@@ -695,7 +694,7 @@ class ThermalViewWidget():
         """
         Process a new message on a topic.
         """
-        if topic=="vrc/pcc/thermal_reading":
+        if topic=="vrc/thermal/thermal_reading":
             payload_json = json.loads(payload)
             datapayload = payload_json['reading']
 
@@ -704,6 +703,7 @@ class ThermalViewWidget():
             asbytes = base64.b64decode(base64Decoded)
             b = bytearray(asbytes)
             int_values = [x for x in b]
+            print(int_values)
             #back on scale
            # pixels = [self.map_value(p, 0, 255, 15.0, 40.0) for p in int_values]
            # pixels = pixels[0:64]

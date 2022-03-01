@@ -2,6 +2,8 @@ import json
 import time
 import base64
 from typing import Any, List
+import board
+
 
 from loguru import logger
 import paho.mqtt.client as mqtt
