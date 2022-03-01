@@ -58,7 +58,7 @@ class PCCModule(object):
         self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage
     ) -> None:
         try:
-            logger.debug(f"{msg.topic}: {str(msg.payload)}")
+            #logger.debug(f"{msg.topic}: {str(msg.payload)}")
 
             if msg.topic in self.topic_map:
                 payload = json.loads(msg.payload)
@@ -130,33 +130,6 @@ class PCCModule(object):
 
     def request_thermal_reading(self, payload) -> None:
         logger.info(f"Request Thermal Reading")
-        logger.debug(str(payload))
-        self.pcc.request_thermal_reading()
-        time.sleep(0.1)
-        data = self.pcc.incoming()
-        if (data == None): 
-            logger.info(f"Request Thermal Reading retuned None")
-            return
-        if (len(data) == 0):
-            logger.info(f"Request Thermal Reading retuned 0 len")
-            return
-        values = bytearray(data)
-        int_values = [x for x in values]
-        logger.debug(str(int_values))
-        logger.debug(len(int_values))
-        logger.debug(str(values))
-        logger.debug(len(values))
-        base64Encoded = base64.b64encode(values)
-        logger.debug(str(base64Encoded))
-        base64_string = base64Encoded.decode('utf-8')
-
-        thermalreading = { "reading":  base64_string}
-        self.mqtt_client.publish(
-                f"{self.topic_prefix}/thermal_reading",
-                json.dumps(thermalreading),
-                retain=False,
-                qos=0,
-            )
         
 
 
