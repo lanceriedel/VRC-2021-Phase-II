@@ -27,7 +27,20 @@ INTERRUPTED = False
 
 NUM_PIXELS = 12
 PIXEL_ORDER = neopixel.GRB
+#RGB
 COLORS = (0xFF0000, 0x00FF00, 0x0000FF)
+CLR_PURPLE=0x6a0dad
+CLR_AQUA=0x00FFFF
+CLR_ORANGE=0xF5A506
+CLR_YELLOW=0xC1E300
+CLR_BLUE=0x001EE3
+
+VIO_LED=1
+PCC_LED=2
+THERMAL_LED=3
+FCC_LED=4
+APRIL_LED=5
+
 DELAY = 0.1
 
 
@@ -61,27 +74,26 @@ class Status(object):
                                     NUM_PIXELS,
                                     pixel_order=PIXEL_ORDER,
                                     auto_write=False)
+
+        self.red_status_all()
+
+        
     def on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -> None:
         try:
             #logger.debug(f"{msg.topic}: {str(msg.payload)}")
+            self.check_status(msg.topic)
+
             if msg.topic in self.topic_map:
                 payload = json.loads(msg.payload)
                 self.topic_map[msg.topic](payload)
+            
+            
         except Exception as e:
             logger.debug(f"{fore.RED}Error handling message on {msg.topic}{style.RESET}") #type: ignore
             print(e)
 
-    def set_cpu_status(self):
+   
 
-        ## Initialize power mode status
-
-        batcmd="/app/nvpmodel --verbose -f /app/nvpmodel.conf -m 0"
-        try:
-            result = subprocess.check_output(batcmd, shell=True,stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            logger.exception("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-
-    
     def on_connect(
         self,
         client: mqtt.Client,
@@ -93,6 +105,40 @@ class Status(object):
         for topic in self.topic_map.keys():
             logger.debug(f"STATUS: Subscribed to: {topic}")
             client.subscribe(topic)
+
+
+    def set_cpu_status(self):
+
+        ## Initialize power mode status
+
+        batcmd="/app/nvpmodel --verbose -f /app/nvpmodel.conf -m 0"
+        try:
+            result = subprocess.check_output(batcmd, shell=True,stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            logger.exception("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
+    def check_status(self, topic) :
+        if 'vrc/vio' in topic: 
+            self.light_up(VIO_LED,CLR_PURPLE)
+        if 'vrc/pcc' in topic:
+            self.light_up(PCC_LED, CLR_AQUA)
+        if 'vrc/fcc' in topic:
+            self.light_up(FCC_LED,CLR_ORANGE)
+        if 'vrc/thermal' in topic:
+            self.light_up(THERMAL_LED,CLR_BLUE)
+        if 'vrc/april' in topic:
+            self.light_up(APRIL_LED,CLR_YELLOW)
+
+    def red_status_all(self):
+        for i in range(NUM_PIXELS):
+            self.pixels[i] = COLORS[0]
+        self.pixels.show()
+           
+
+
+    def light_up(self, which_one, color):
+        self.pixels[which_one] = color
+        self.pixels.show()
 
     def light_status(self, msg: dict):
         for color in COLORS:
