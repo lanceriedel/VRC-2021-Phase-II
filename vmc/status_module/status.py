@@ -15,7 +15,7 @@ print("finished basic imports")
 # pip installed packages
 from loguru import logger
 import paho.mqtt.client as mqtt
-
+import subprocess
 from typing import Any
 
 print("finished all imports")
@@ -33,7 +33,7 @@ DELAY = 0.1
 
 class Status(object):
     def __init__(self):
-
+        self.initialized = False
         self.mqtt_host = "mqtt"
         self.mqtt_port = 18830
 
@@ -61,8 +61,6 @@ class Status(object):
                                     NUM_PIXELS,
                                     pixel_order=PIXEL_ORDER,
                                     auto_write=False)
-
-
     def on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -> None:
         try:
             #logger.debug(f"{msg.topic}: {str(msg.payload)}")
@@ -73,6 +71,17 @@ class Status(object):
             logger.debug(f"{fore.RED}Error handling message on {msg.topic}{style.RESET}") #type: ignore
             print(e)
 
+    def set_cpu_status(self):
+
+        ## Initialize power mode status
+
+        batcmd="/app/nvpmodel --verbose -f /app/nvpmodel.conf -m 0"
+        try:
+            result = subprocess.check_output(batcmd, shell=True,stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            logger.exception("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
+    
     def on_connect(
         self,
         client: mqtt.Client,
@@ -85,28 +94,6 @@ class Status(object):
             logger.debug(f"STATUS: Subscribed to: {topic}")
             client.subscribe(topic)
 
-    def request_thermal_reading(self, msg: dict):
-        reading = bytearray(64)
-        i=0
-        for row in self.amg.pixels:
-            for pix in row:
-                pixasint = round(pix)
-                bpix=pixasint.to_bytes(1, 'big')
-                reading[i]=bpix[0]
-                i+=1
-        base64Encoded = base64.b64encode(reading)
-        #logger.debug(str(base64Encoded))
-        base64_string = base64Encoded.decode('utf-8')
-
-        thermalreading = { "reading":  base64_string}
-        self.mqtt_client.publish(
-                f"{self.topic_prefix}/thermal_reading",
-                json.dumps(thermalreading),
-                retain=False,
-                qos=0,
-            )
-
-
     def light_status(self, msg: dict):
         for color in COLORS:
             for i in range(NUM_PIXELS):
@@ -116,10 +103,21 @@ class Status(object):
                 self.pixels.fill(0)
 
     def status_check(self):
-	self.pixels[0] = 0xFF0000
-	time.sleep(DELAY)
-        self.pixels.fill(0)
-	
+        if not self.initialized:
+            self.initialized = True
+            self.set_cpu_status()
+
+        batcmd="/app/nvpmodel -f /app/nvpmodel.conf -q"
+        try:
+            result = subprocess.check_output(batcmd, shell=True,stderr=subprocess.STDOUT)
+            if b'MAXN' in result:
+                self.pixels[0] = COLORS[1]
+            else:
+                self.pixels[0] = COLORS[0]
+            self.pixels.show()
+        except subprocess.CalledProcessError as e:
+            logger.exception("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
     def status_thread(self):
         msg={}
         while True:
@@ -129,7 +127,7 @@ class Status(object):
 
     def run(self):
         # tells the os what to name this process, for debugging
-        setproctitle("thermal_process")
+        setproctitle("status_process")
         # allows for graceful shutdown of any child threads
 
         self.mqtt_client.connect(host=self.mqtt_host, port=self.mqtt_port, keepalive=60)
@@ -142,5 +140,5 @@ class Status(object):
         self.mqtt_client.loop_forever()
 
 if __name__ == "__main__":
-    thermal = Thermal()
-    thermal.run()
+    status = Status()
+    status.run()

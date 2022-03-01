@@ -4,6 +4,6 @@ paho-mqtt==1.5.1
 Jetson.GPIO==2.0.17
 adafruit-circuitpython-register
 adafruit-circuitpython-busdevice
-adafruit-circuitpython-amg88xx
+adafruit-circuitpython-neopixel-spi
 colored==1.4.2
 setproctitle==1.2.2
