@@ -159,12 +159,6 @@ class Joystick(QtWidgets.QWidget):
         if (x_servo_percent>self.servoxmax): return
         if (y_servo_percent>self.servoymax): return
 
-        #need to reverse
-        print("x_servo_percent")
-        print(x_servo_percent)
-        print("y_servo_percent")
-        print(y_servo_percent)
-
 
         payload = {"servo": 2, "percent": x_servo_percent}
         self.mqtt_client.publish("vrc/pcc/set_servo_pct", payload=json.dumps(payload))
