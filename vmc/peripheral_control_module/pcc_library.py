@@ -31,10 +31,8 @@ class VRC_Peripheral(object):
             "SET_SWITCH_OFF" : 9,
             "SET_LASER_ON" : 10,
             "SET_LASER_OFF" : 11,
-            "REQUEST_THERMAL_READING" : 12,
-            "RESET_VRC_PERIPH": 13,
-            "CHECK_SERVO_CONTROLLER": 14,
-            "SEND_THERMAL_READING": 15,
+            "RESET_VRC_PERIPH": 12,
+            "CHECK_SERVO_CONTROLLER": 13,
         }
 
         self.use_serial = use_serial
@@ -209,9 +207,6 @@ class VRC_Peripheral(object):
             length = 1
             self.ser.write(self._construct_payload(command, length))
         
-    def request_thermal_reading(self) -> None:
-        print("request_thermal_reading")
-
     def set_laser_off(self) -> None:
         if self.use_serial:
             command = self.commands["SET_LASER_OFF"]
