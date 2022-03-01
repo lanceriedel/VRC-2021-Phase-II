@@ -7,6 +7,8 @@ import board
 import adafruit_amg88xx
 from colored import fore, back, style
 import base64
+import neopixel_spi as neopixel
+
 from setproctitle import setproctitle
 
 print("finished basic imports")
@@ -24,6 +26,12 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 INTERRUPTED = False
 
+NUM_PIXELS = 12
+PIXEL_ORDER = neopixel.GRB
+COLORS = (0xFF0000, 0x00FF00, 0x0000FF)
+DELAY = 0.1
+
+
 class Thermal(object):
     def __init__(self):
 
@@ -40,12 +48,21 @@ class Thermal(object):
         
         self.topic_map = {
             "vrc/thermal/request_thermal_reading":self.request_thermal_reading,
+            "vrc/thermal/light_status":self.light_status,
         }
 
         print("connecting to thermal camera...")
         i2c = board.I2C()
         self.amg = adafruit_amg88xx.AMG88XX(i2c)
         print("Connected to Thermal Camera!")
+
+
+        self.spi = board.SPI()
+
+        self.pixels = neopixel.NeoPixel_SPI(self.spi,
+                                    NUM_PIXELS,
+                                    pixel_order=PIXEL_ORDER,
+                                    auto_write=False)
 
 
     def on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -> None:
@@ -91,6 +108,14 @@ class Thermal(object):
                 qos=0,
             )
 
+
+    def light_status(self, msg: dict):
+        for color in COLORS:
+            for i in range(NUM_PIXELS):
+                self.pixels[i] = color
+                self.pixels.show()
+                time.sleep(DELAY)
+                self.pixels.fill(0)
 
     def request_thread(self):
         msg={}
