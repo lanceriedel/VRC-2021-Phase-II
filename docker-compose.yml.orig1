@@ -33,13 +33,6 @@ services:
     devices:
       - "/dev/ttyACM0:/dev/ttyACM0"
 
-  thermal:
-    depends_on:
-      - mqtt
-    privileged: true
-    image: lance/vrc_thermal_module:latest
-    restart: on-failure
-  
   vio:
     depends_on:
       - mqtt

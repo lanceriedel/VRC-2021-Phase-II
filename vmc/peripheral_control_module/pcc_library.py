@@ -53,34 +53,6 @@ class VRC_Peripheral(object):
         self.shutdown: bool = False
 
 
-        # [$][P][>][LENGTH-HI][LENGTH-LOW][DATA][CRC]
-
-    def parsein(self) -> List[int]:
-        while self.ser.in_waiting > 0:
-            logger.debug("data to be read parsein...")
-            readdata = self.ser.read(2047)
-            if (readdata[0]!=0x50): 
-                logger.debug("Not correct start of instructions")
-                logger.debug(readdata[1])
-
-                return
-            if (readdata[1]!=0x3E):
-                logger.debug("Not correct direction")
-                logger.debug(readdata[2])
-                return
-            code = readdata[2]
-            if (code==self.commands["SEND_THERMAL_READING"]):
-                byte_val = [readdata[4],readdata[3]]
-                numrecs = int.from_bytes(byte_val, "big")
-                logger.debug("datasize:")
-                logger.debug(numrecs)
-                offset = numrecs+5
-                data_val = readdata[5:offset]
-                logger.debug(data_val) 
-                return data_val
-            else:
-                logger.debug("not correct code")
-                logger.debug(code)
 
     def run(self) -> None:
         logger.debug("Initiating RUN>>")
@@ -91,20 +63,6 @@ class VRC_Peripheral(object):
                   logger.debug("bytes")
                 if (self.ser.in_waiting==0):
                     logger.debug("not bytes")
-            time.sleep(0.01)
-
-    def incoming(self) -> List[int]:
-        logger.debug("checking for incoming")
-        while self.ser.in_waiting > 0:
-            logger.debug("data to be read...")
-            readdata = self.ser.read(1)
-            if (readdata[0]==0x24):
-                return self.parsein()
-            #else:
-                #print(readdata, end="")
-                #logger.debug(readdata)
-            if (self.ser.in_waiting==0):
-                logger.debug("not bytes")
             time.sleep(0.01)
 
     def set_base_color(self, wrgb: List[int]) -> None:
@@ -252,10 +210,7 @@ class VRC_Peripheral(object):
             self.ser.write(self._construct_payload(command, length))
         
     def request_thermal_reading(self) -> None:
-        if self.use_serial:
-            command = self.commands["REQUEST_THERMAL_READING"]
-            length = 1
-            self.ser.write(self._construct_payload(command, length))
+        print("request_thermal_reading")
 
     def set_laser_off(self) -> None:
         if self.use_serial:

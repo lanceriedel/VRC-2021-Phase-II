@@ -96,7 +96,7 @@ class Thermal(object):
         msg={}
         while True:
             self.request_thermal_reading(msg)
-            time.sleep(.1)
+            time.sleep(.2)
         
 
     def run(self):
