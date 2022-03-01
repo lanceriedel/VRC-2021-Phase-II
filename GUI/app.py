@@ -145,7 +145,7 @@ class Joystick(QtWidgets.QWidget):
     def update_servos(self):
         ms = int(round(time.time() * 1000))
         timesince = ms - self.lasttime
-        if (timesince<100):
+        if (timesince<50):
             return
         self.lasttime = ms
         y_reversed = 100 - self.current_y 
