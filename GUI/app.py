@@ -74,7 +74,7 @@ class MQTTClient(QtCore.QObject):
         """
         Callback for every MQTT message
         """
-        if msg.topic=="vrc/pcc/thermal_readingf":
+        if msg.topic=="vrc/pcc/thermal_reading":
             self.message.emit(msg.topic, msg.payload)
             print("emitting message")
         else:
@@ -132,16 +132,39 @@ class Joystick(QtWidgets.QWidget):
         self.__maxDistance = 50
         self.current_y = 0
         self.current_x = 0
+        self.lasttime = 0
+        self.servoxmin = 10
+        self.servoymin = 10
+        self.servoxmax = 99
+        self.servoymax = 99
+
 
     def map_value(self,x, in_min, in_max, out_min, out_max):
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
     def update_servos(self):
+        ms = int(round(time.time() * 1000))
+        timesince = ms - self.lasttime
+        if (timesince<100):
+            return
+        self.lasttime = ms
         y_reversed = 100 - self.current_y 
-        x_servo_percent = self.map_value(self.current_x, 0, 100, 10, 99) 
-        y_servo_percent = self.map_value(y_reversed, 0, 100, 10, 99) 
-        #need to reverse
         
+        x_servo_percent = round(self.map_value(self.current_x, 0, 100, 10, 99) )
+        y_servo_percent = round(self.map_value(y_reversed, 0, 100, 10, 99) )
+
+
+        if (x_servo_percent<self.servoxmin): return
+        if (y_servo_percent<self.servoymin): return
+        if (x_servo_percent>self.servoxmax): return
+        if (y_servo_percent>self.servoymax): return
+
+        #need to reverse
+        print("x_servo_percent")
+        print(x_servo_percent)
+        print("y_servo_percent")
+        print(y_servo_percent)
+
 
         payload = {"servo": 2, "percent": x_servo_percent}
         self.mqtt_client.publish("vrc/pcc/set_servo_pct", payload=json.dumps(payload))
@@ -703,7 +726,7 @@ class ThermalViewWidget():
             asbytes = base64.b64decode(base64Decoded)
             b = bytearray(asbytes)
             int_values = [x for x in b]
-            print(int_values)
+            #print(int_values)
             #back on scale
            # pixels = [self.map_value(p, 0, 255, 15.0, 40.0) for p in int_values]
            # pixels = pixels[0:64]
